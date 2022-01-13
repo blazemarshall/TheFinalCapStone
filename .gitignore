@@ -11,10 +11,11 @@ coverage/
 # production
 build/
 
-# misc
+# misc  
+#TopEND LOOK HERE
 .eslintcache
 .DS_Store
-.env
+.env   
 .env.*
 !.env.sample
 .idea/
