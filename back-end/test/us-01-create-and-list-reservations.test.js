@@ -109,7 +109,7 @@ describe("US-01 - Create and list reservations", () => {
       expect(response.status).toBe(400);
     });
 
-    test("returns 400 if last_name is empty", async () => {
+    test("returns 400 if last_name is missing", async () => {
       const data = {
         first_name: "first",
         last_name: "",

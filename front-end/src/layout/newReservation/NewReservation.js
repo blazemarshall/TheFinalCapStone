@@ -1,33 +1,81 @@
 import React, { useState } from "react";
+import { Link, useHistory } from "react-router-dom";
+import { createReservation } from "../../utils/api";
 
 export default function NewReservation() {
+  const history = useHistory();
   const initialReservationFields = {
-    firstName: "",
-    lastName: "",
-    mobileNumber: "",
-    reservationDate: "",
-    reservationTime: "",
-    numberOfPeople: "",
+    first_name: "",
+    last_name: "",
+    mobile_number: "",
+    reservation_date: "",
+    reservation_time: "",
+    people: 0,
   };
-  const [formData, setFormData] = useState(initialReservationFields);
 
-  const changeHandler = ({ target }) => {
-    setFormData({ ...formData, [target.name]: target.value });
-  };
-  const submitHandler = (e) => {
+  // const [formData, setFormData] = useState(initialReservationFields);
+  const [reservation, setReservation] = useState(initialReservationFields);
+
+  // const changeHandler = (e) => {
+  //   setFormData({ ...formData, [e.target.name]: e.target.value });
+  // };
+
+  function changeHandler({ target: { name, value } }) {
+    setReservation((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  }
+
+  function changeHandlerNum({ target: { name, value } }) {
+    setReservation((prevState) => ({
+      ...prevState,
+      [name]: Number(value),
+    }));
+  }
+
+  // async function submitHandler(e) {
+  //   e.preventDefault();
+  //   const controller = new AbortController();
+  //   try {
+  //     // formData.people = Number(formData.people);
+  //     await createReservation(reservation, controller.signal);
+  //     const date = reservation.reservation_date;
+  //     history.push(`/dashboard?date=${date}`);
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  //   return () => controller.abort();
+  // }
+
+  function submitHandler(e) {
+    console.log(reservation);
     e.preventDefault();
-
-    // let destination = "";
-    // create need functionalitity
-  };
+    const controller = new AbortController();
+    async function newReservation() {
+      try {
+        await createReservation(reservation, controller.signal);
+        let date = reservation.reservation_date;
+        setReservation(initialReservationFields);
+        history.push(`/dashboard?date=${date}`);
+      } catch (error) {
+        throw error;
+      }
+    }
+    newReservation();
+    return () => {
+      controller.abort();
+    };
+  }
 
   return (
     <div>
       <h1>Create Reservation</h1>
-      <form>
+      <form onSubmit={submitHandler}>
         <div>
-          <div className="row">
+          <div>
             <input
+              id="first_name"
               name="first_name"
               required
               type="text"
@@ -35,10 +83,12 @@ export default function NewReservation() {
               placeholder="First name"
               aria-label="First Name"
               onChange={changeHandler}
+              value={reservation.first_name}
             />
           </div>
           <div>
             <input
+              id="last_name"
               name="last_name"
               required
               type="text"
@@ -46,21 +96,25 @@ export default function NewReservation() {
               placeholder="Last Name"
               aria-label="Last name"
               onChange={changeHandler}
+              value={reservation.last_name}
             />
           </div>
           <div>
             <input
+              id="mobile_number"
               name="mobile_number"
               required
-              type="tel"
+              type="number"
               className="form-control"
               placeholder="Mobile Number"
               aria-label="Mobile Number"
               onChange={changeHandler}
+              value={reservation.mobile_number}
             />
           </div>
           <div>
             <input
+              id="reservation_date"
               name="reservation_date"
               required
               type="date"
@@ -68,9 +122,11 @@ export default function NewReservation() {
               placeholder="Date of reservation"
               aria-label="reservation_date"
               onChange={changeHandler}
+              value={reservation.reservation_date}
             />
             <div>
               <input
+                id="reservation_time"
                 name="reservation_time"
                 required
                 type="time"
@@ -78,10 +134,12 @@ export default function NewReservation() {
                 placeholder="Time of reservation"
                 aria-label="reservation_time"
                 onChange={changeHandler}
+                value={reservation.reservation_time}
               />
             </div>
             <div>
               <input
+                id="people"
                 name="people"
                 required
                 type="number"
@@ -89,14 +147,18 @@ export default function NewReservation() {
                 placeholder="Number of People"
                 aria-label="people"
                 min="1"
-                onChange={changeHandler}
+                onChange={changeHandlerNum}
+                value={reservation.people}
               />
             </div>
 
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" className="btn btn-primary">
               Submit
             </button>
-            <button type="button" class="btn btn-secondary">
+            <button
+              onClick={() => history.goBack()}
+              className="btn btn-secondary"
+            >
               Cancel
             </button>
           </div>
