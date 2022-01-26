@@ -3,27 +3,17 @@
  */
 const service = require("./reservations.service");
 const asyncEB = require("../errors/asyncErrorBoundary");
-const hasProperties = require("../errors/hasProperties");
 const {
   DateCorrectFormat,
   isATime,
   PeopleNumber,
   hasOnlyValidProperties,
-  // isTuesday,
+  isTuesday,
+  properties,
+  isPast,
 } = require("./middlewareValidation");
 
-const validProperties = [
-  "first_name",
-  "last_name",
-  "mobile_number",
-  "reservation_date",
-  "reservation_time",
-  "people",
-];
-
-const properties = hasProperties(...validProperties);
-
-//add query for date
+//
 async function list(req, res, next) {
   try {
     let { date } = req.query;
@@ -46,10 +36,11 @@ module.exports = {
   create: [
     properties,
     hasOnlyValidProperties,
-    isATime,
-    // isTuesday,
     PeopleNumber,
     DateCorrectFormat,
+    isATime,
+    isTuesday,
+    isPast,
     asyncEB(create),
   ],
 };

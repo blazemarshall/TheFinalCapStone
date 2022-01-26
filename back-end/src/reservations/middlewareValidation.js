@@ -1,3 +1,5 @@
+const hasProperties = require("../errors/hasProperties");
+
 //reservationDate is a date?
 function DateCorrectFormat(req, res, next) {
   const { data: { reservation_date } = {} } = req.body;
@@ -48,6 +50,7 @@ function PeopleNumber(req, res, next) {
   return next();
 }
 
+// later for reading functions
 // async function reservationExists(req, res, next) {
 //   const review = await service.read(req.params.Id);
 //   if (review) {
@@ -73,10 +76,55 @@ function hasOnlyValidProperties(req, res, next) {
   next();
 }
 
+const properties = hasProperties(...validProperties);
+
+//------------isTuesday-------------
+function isTuesday(req, res, next) {
+  let reqData = req.body.data.reservation_date.split("-");
+
+  let year = reqData[0];
+  let month = reqData[1];
+  let day = reqData[2];
+
+  let reserved = new Date(year, month - 1, day);
+
+  if (reserved.getUTCDay() === 2) {
+    console.log("tues");
+    return next({
+      message: "The restaurant is closed on Tuesdays.",
+      status: 400,
+    });
+  } else {
+    next();
+  }
+}
+
+//-----------------ReservationIsInPast?----------------
+function isPast(req, res, next) {
+  current = new Date();
+  let date = current.getDate(),
+    year = current.getFullYear(),
+    dayOfWeek = current.getDay(),
+    month = current.getMonth() + 1,
+    reqData = req.body.data.reservation_date;
+  let rDate = reqData.split("-");
+
+  if (rDate[0] >= year || rDate[1] >= month || rDate[2] >= date) {
+    next({
+      message: "Reservations can only be created in the future",
+      status: 400,
+    });
+  } else {
+    next();
+  }
+}
+
 module.exports = {
   DateCorrectFormat,
-  // isTuesday,
   isATime,
+  isPast,
+  isTuesday,
   PeopleNumber,
   hasOnlyValidProperties,
+  properties,
 };

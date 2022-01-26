@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
@@ -24,7 +24,7 @@ function Dashboard({ dateParam }) {
 
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
-  const dateV = today();
+
   const [date, setDate] = useState(query.get("date") || dateParam);
   useEffect(loadDashboard, [date]);
 

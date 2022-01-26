@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { createReservation } from "../../utils/api";
+import ErrorAlert from "../ErrorAlert";
 
-export default function NewReservation() {
+export default function NewReservation({ reservationsError }) {
   const history = useHistory();
   const initialReservationFields = {
     first_name: "",
@@ -12,7 +13,7 @@ export default function NewReservation() {
     reservation_time: "",
     people: 0,
   };
-
+  const [apiErrors, setApiErrors] = useState(null);
   const [formData, setFormData] = useState(initialReservationFields);
 
   const changeHandler = (e) => {
@@ -36,11 +37,15 @@ export default function NewReservation() {
       history.push(`/dashboard?date=${date}`);
       setFormData({ ...initialReservationFields });
     } catch (error) {
+      setApiErrors(error);
+      console.log(error.status, "status");
+
       throw error;
     }
     return () => controller.abort();
   }
-
+  let tuesday = true;
+  let past = true;
   return (
     <div>
       <h1>Create Reservation</h1>
@@ -124,16 +129,18 @@ export default function NewReservation() {
                 value={formData.people}
               />
             </div>
-
-            <button type="submit" className="btn btn-primary">
-              Submit
-            </button>
-            <button
-              onClick={() => history.goBack()}
-              className="btn btn-secondary"
-            >
-              Cancel
-            </button>
+            <ErrorAlert error={apiErrors} />
+            <div>
+              <button type="submit" className="btn btn-primary">
+                Submit
+              </button>
+              <button
+                onClick={() => history.goBack()}
+                className="btn btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </form>
