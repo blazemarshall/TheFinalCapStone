@@ -13,60 +13,61 @@ export default function NewReservation() {
     people: 0,
   };
 
-  // const [formData, setFormData] = useState(initialReservationFields);
-  const [reservation, setReservation] = useState(initialReservationFields);
+  const [formData, setFormData] = useState(initialReservationFields);
+  // const [reservation, setReservation] = useState(initialReservationFields);
 
-  // const changeHandler = (e) => {
-  //   setFormData({ ...formData, [e.target.name]: e.target.value });
-  // };
+  const changeHandler = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  function changeHandler({ target: { name, value } }) {
-    setReservation((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  }
+  // function changeHandler({ target: { name, value } }) {
+  //   setReservation((prevState) => ({
+  //     ...prevState,
+  //     [name]: value,
+  //   }));
+  // }
 
   function changeHandlerNum({ target: { name, value } }) {
-    setReservation((prevState) => ({
+    setFormData((prevState) => ({
       ...prevState,
       [name]: Number(value),
     }));
   }
 
-  // async function submitHandler(e) {
-  //   e.preventDefault();
-  //   const controller = new AbortController();
-  //   try {
-  //     // formData.people = Number(formData.people);
-  //     await createReservation(reservation, controller.signal);
-  //     const date = reservation.reservation_date;
-  //     history.push(`/dashboard?date=${date}`);
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  //   return () => controller.abort();
-  // }
-
-  function submitHandler(e) {
-    console.log(reservation);
+  async function submitHandler(e) {
     e.preventDefault();
     const controller = new AbortController();
-    async function newReservation() {
-      try {
-        await createReservation(reservation, controller.signal);
-        let date = reservation.reservation_date;
-        setReservation(initialReservationFields);
-        history.push(`/dashboard?date=${date}`);
-      } catch (error) {
-        throw error;
-      }
+    try {
+      formData.people = Number(formData.people);
+      await createReservation(formData, controller.signal);
+      const date = formData.reservation_date;
+      history.push(`/dashboard?date=${date}`);
+      setFormData({ ...initialReservationFields });
+    } catch (error) {
+      throw error;
     }
-    newReservation();
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }
+
+  // function submitHandler(e) {
+  //   console.log(reservation);
+  //   e.preventDefault();
+  //   const controller = new AbortController();
+  //   async function newReservation() {
+  //     try {
+  //       await createReservation(reservation, controller.signal);
+  //       let date = reservation.reservation_date;
+  //       setReservation(initialReservationFields);
+  //       history.push(`/dashboard?date=${date}`);
+  //     } catch (error) {
+  //       throw error;
+  //     }
+  //   }
+  //   newReservation();
+  //   return () => {
+  //     controller.abort();
+  //   };
+  // }
 
   return (
     <div>
@@ -75,7 +76,7 @@ export default function NewReservation() {
         <div>
           <div>
             <input
-              id="first_name"
+              // id="first_name"
               name="first_name"
               required
               type="text"
@@ -83,38 +84,38 @@ export default function NewReservation() {
               placeholder="First name"
               aria-label="First Name"
               onChange={changeHandler}
-              value={reservation.first_name}
+              value={formData.first_name}
             />
           </div>
           <div>
             <input
-              id="last_name"
+              // id="last_name"
               name="last_name"
               required
               type="text"
               className="form-control"
               placeholder="Last Name"
-              aria-label="Last name"
+              aria-label="last_name"
               onChange={changeHandler}
-              value={reservation.last_name}
+              value={formData.last_name}
             />
           </div>
           <div>
             <input
-              id="mobile_number"
+              // id="mobile_number"
               name="mobile_number"
               required
-              type="number"
+              type="tel"
               className="form-control"
               placeholder="Mobile Number"
               aria-label="Mobile Number"
               onChange={changeHandler}
-              value={reservation.mobile_number}
+              value={formData.mobile_number}
             />
           </div>
           <div>
             <input
-              id="reservation_date"
+              // id="reservation_date"
               name="reservation_date"
               required
               type="date"
@@ -122,11 +123,11 @@ export default function NewReservation() {
               placeholder="Date of reservation"
               aria-label="reservation_date"
               onChange={changeHandler}
-              value={reservation.reservation_date}
+              value={formData.reservation_date}
             />
             <div>
               <input
-                id="reservation_time"
+                // id="reservation_time"
                 name="reservation_time"
                 required
                 type="time"
@@ -134,12 +135,12 @@ export default function NewReservation() {
                 placeholder="Time of reservation"
                 aria-label="reservation_time"
                 onChange={changeHandler}
-                value={reservation.reservation_time}
+                value={formData.reservation_time}
               />
             </div>
             <div>
               <input
-                id="people"
+                // id="people"
                 name="people"
                 required
                 type="number"
@@ -148,7 +149,7 @@ export default function NewReservation() {
                 aria-label="people"
                 min="1"
                 onChange={changeHandlerNum}
-                value={reservation.people}
+                value={formData.people}
               />
             </div>
 

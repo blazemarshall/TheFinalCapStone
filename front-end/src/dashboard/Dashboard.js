@@ -19,11 +19,13 @@ function Dashboard({ dateParam }) {
   }
 
   const history = useHistory();
-  // const query = useQuery();
+  const query = useQuery();
+  console.log(query.get("date"), "query");
+
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const dateV = today();
-  const [date, setDate] = useState(dateParam);
+  const [date, setDate] = useState(query.get("date") || dateParam);
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
@@ -39,13 +41,6 @@ function Dashboard({ dateParam }) {
 
   // twelveHourTime();
 
-  let arr = [];
-  //deposits reservations into array.
-  for (let i = 0; i < reservations.length; i++) {
-    if (reservations[i].reservation_date === date) {
-      arr.push(reservations[i]);
-    }
-  }
   //maps reservations
   const reserveMap = reservations.map((item, index) => {
     return (
@@ -58,7 +53,6 @@ function Dashboard({ dateParam }) {
         <div>Mobile Number : {item.mobile_number}</div>
       </li>
     );
-    // console.log("item", item.first_name);
   });
 
   //increments date to tomorrow
@@ -76,6 +70,7 @@ function Dashboard({ dateParam }) {
   //fix me
   function todayHandler() {
     setDate(today());
+
     history.push(`/dashboard?date=${today()}`);
   }
   // function pusher() {
