@@ -14,18 +14,10 @@ export default function NewReservation() {
   };
 
   const [formData, setFormData] = useState(initialReservationFields);
-  // const [reservation, setReservation] = useState(initialReservationFields);
 
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  // function changeHandler({ target: { name, value } }) {
-  //   setReservation((prevState) => ({
-  //     ...prevState,
-  //     [name]: value,
-  //   }));
-  // }
 
   function changeHandlerNum({ target: { name, value } }) {
     setFormData((prevState) => ({
@@ -48,26 +40,6 @@ export default function NewReservation() {
     }
     return () => controller.abort();
   }
-
-  // function submitHandler(e) {
-  //   console.log(reservation);
-  //   e.preventDefault();
-  //   const controller = new AbortController();
-  //   async function newReservation() {
-  //     try {
-  //       await createReservation(reservation, controller.signal);
-  //       let date = reservation.reservation_date;
-  //       setReservation(initialReservationFields);
-  //       history.push(`/dashboard?date=${date}`);
-  //     } catch (error) {
-  //       throw error;
-  //     }
-  //   }
-  //   newReservation();
-  //   return () => {
-  //     controller.abort();
-  //   };
-  // }
 
   return (
     <div>

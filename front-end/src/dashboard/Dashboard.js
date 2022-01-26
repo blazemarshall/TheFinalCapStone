@@ -67,17 +67,12 @@ function Dashboard({ dateParam }) {
     history.push(`/dashboard?date=${previous(date)}`);
   }
 
-  //fix me
+  //loads reservations for today
   function todayHandler() {
     setDate(today());
-
     history.push(`/dashboard?date=${today()}`);
   }
-  // function pusher() {
-  //   // loadDashboard();
-  // }
 
-  // console.log(date, "date", "today >", today()); // }
   return (
     <main>
       <div className="">
