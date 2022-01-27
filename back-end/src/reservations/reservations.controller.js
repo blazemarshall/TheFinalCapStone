@@ -11,6 +11,7 @@ const {
   isTuesday,
   properties,
   isPast,
+  correctOpenTimes,
 } = require("./middlewareValidation");
 
 //
@@ -41,6 +42,7 @@ module.exports = {
     isATime,
     isTuesday,
     isPast,
+    correctOpenTimes,
     asyncEB(create),
   ],
 };

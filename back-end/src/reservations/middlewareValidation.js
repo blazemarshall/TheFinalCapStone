@@ -50,7 +50,7 @@ function PeopleNumber(req, res, next) {
   return next();
 }
 
-// later for reading functions
+// later for reading individual reservations
 // async function reservationExists(req, res, next) {
 //   const review = await service.read(req.params.Id);
 //   if (review) {
@@ -101,22 +101,59 @@ function isTuesday(req, res, next) {
 
 //-----------------ReservationIsInPast?----------------
 function isPast(req, res, next) {
-  current = new Date();
-  let date = current.getDate(),
-    year = current.getFullYear(),
-    dayOfWeek = current.getDay(),
-    month = current.getMonth() + 1,
-    reqData = req.body.data.reservation_date;
-  let rDate = reqData.split("-");
+  let current = new Date();
 
-  if (rDate[0] >= year || rDate[1] >= month || rDate[2] >= date) {
+  let reqData = req.body.data.reservation_date,
+    rDate = reqData.split("-");
+
+  resDate = new Date(Number(rDate[0]), Number(rDate[1]), Number(rDate[2]));
+  if (current.getTime() > resDate.getTime()) {
     next({
       message: "Reservations can only be created in the future",
       status: 400,
     });
   } else {
+    console.log("works");
     next();
   }
+}
+// --------------reservation times are correct?------------------------
+function correctOpenTimes(req, res, next) {
+  let rTime = req.body.data.reservation_time.split(":");
+
+  console.log(rTime, "rTime");
+  let current = new Date(),
+    hours = current.getHours(),
+    minutes = current.getMinutes(),
+    rHours = rTime[0],
+    rMins = rTime[1],
+    rNumber = rHours + rMins,
+    cNumber = hours + minutes;
+
+  //if before 10:30 am
+  if (Number(rNumber) < 1030) {
+    next({
+      message: "before 10:30am restaurant is closed.",
+      status: 400,
+    });
+  }
+  //if after 930 pm
+  if (Number(rNumber) > 2130) {
+    next({
+      message:
+        "Cannot make reservations after 9:30. Restaurant closes at 10:30pm.",
+      status: 400,
+    });
+  }
+
+  //if time is past or less than current time
+  if (rNumber < cNumber) {
+    next({
+      message: "cannot make reservations in the past",
+      status: 400,
+    });
+  }
+  next();
 }
 
 module.exports = {
@@ -127,4 +164,5 @@ module.exports = {
   PeopleNumber,
   hasOnlyValidProperties,
   properties,
+  correctOpenTimes,
 };
