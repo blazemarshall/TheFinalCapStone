@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { createReservation } from "../../utils/api";
-import ErrorAlert from "../ErrorAlert";
 import NewReservationForm from "./NewReservationForm";
+
 export default function NewReservation({ reservationsError }) {
   const history = useHistory();
   const initialReservationFields = {
@@ -35,7 +35,7 @@ export default function NewReservation({ reservationsError }) {
       await createReservation(formData, controller.signal);
       const date = formData.reservation_date;
       history.push(`/dashboard?date=${date}`);
-      setFormData({ ...initialReservationFields });
+      await setFormData({ ...initialReservationFields });
     } catch (error) {
       setApiErrors(error);
       console.log(error.status, "status");
@@ -44,8 +44,7 @@ export default function NewReservation({ reservationsError }) {
     }
     return () => controller.abort();
   }
-  let tuesday = true;
-  let past = true;
+
   return (
     <div>
       <NewReservationForm

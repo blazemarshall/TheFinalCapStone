@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 
-import { listReservations } from "../utils/api";
+import { listReservations, listTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import formatReservationTime from "../utils/format-reservation-time";
 import { previous, next, today } from "../utils/date-time";
@@ -20,12 +20,11 @@ function Dashboard({ dateParam }) {
 
   const history = useHistory();
   const query = useQuery();
-  console.log(query.get("date"), "query");
-
+  const [tables, setTables] = useState([]);
   const [reservations, setReservations] = useState([]);
-  const [reservationsError, setReservationsError] = useState(null);
-
   const [date, setDate] = useState(query.get("date") || dateParam);
+  const [reservationsError, setReservationsError] = useState(null);
+  const [tablesError, setTablesError] = useState(null);
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
@@ -33,7 +32,13 @@ function Dashboard({ dateParam }) {
     setReservationsError(null);
     listReservations({ date }, abortController.signal)
       .then(setReservations)
-      .catch(setReservationsError);
+      .catch(setReservationsError)
+      .then(
+        listTables({}, abortController.signal)
+          .then(setTables)
+          .catch(setTablesError)
+      );
+
     return () => abortController.abort();
   }
 
@@ -46,14 +51,41 @@ function Dashboard({ dateParam }) {
     return (
       <li className="col " key={index}>
         {" "}
-        <div>{item.reservation_time}</div>
-        <div>
+        <div className="resListItems">{item.reservation_time}</div>
+        <div>Reservation Id :{item.reservation_id}</div>
+        <div className="resListItems">
           Name : {item.first_name} {item.last_name}
         </div>
-        <div>Mobile Number : {item.mobile_number}</div>
+        <div className="resListItems">Mobile Number : {item.mobile_number}</div>
+        <div>
+          <a
+            href={`reservations/${item.reservation_id}/seat`}
+            to=""
+            className="btn-success btn"
+          >
+            Seat
+          </a>
+        </div>
       </li>
     );
   });
+
+  // maps tables
+  const tableMap = tables.map((item, index) => {
+    console.log("Table", tables);
+    return (
+      <li key={index + item.table_name}>
+        <div>Table Name : {item.table_name}</div>
+        <div>Capacity : {item.capacity}</div>
+        <div data-table-id-status={`${item.table_id}`}>
+          {item.reservation_id ? "Occupied" : "Free"}
+        </div>
+      </li>
+    );
+  });
+
+  //seat handler
+  // function seatHandler(){}
 
   //increments date to tomorrow
   function forwardHandler() {
@@ -95,9 +127,15 @@ function Dashboard({ dateParam }) {
           Next Day
         </button>
       </div>
-      <ErrorAlert error={reservationsError} />
+      <ErrorAlert error={reservationsError || tablesError} />
       <div>
-        <ul>{reserveMap}</ul>
+        <div>
+          <ul>{reserveMap}</ul>
+        </div>
+        <div>
+          <h4>List of tables</h4>
+          <ul>{tableMap}</ul>
+        </div>
       </div>
     </main>
   );

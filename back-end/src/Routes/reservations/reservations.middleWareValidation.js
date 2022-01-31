@@ -1,8 +1,9 @@
-const hasProperties = require("../errors/hasProperties");
+const hasProperties = require("../../errors/hasProperties");
 
 //reservationDate is a date?
 function DateCorrectFormat(req, res, next) {
   const { data: { reservation_date } = {} } = req.body;
+  console.log("4---reservationMiddleWare,DateCorrectFormat", reservation_date);
   // const dateSplit = reservation_date.split("/");
   const regex = /\d{4}-\d{2}-\d{2}/;
   if (!regex.test(reservation_date)) {
@@ -17,6 +18,10 @@ function DateCorrectFormat(req, res, next) {
 //reservationTime is a time?
 function isATime(req, res, next) {
   const { data: { reservation_time } = {} } = req.body;
+  console.log(
+    "5----ln 20,reservationsMiddleware,isATime,data=reservation_time",
+    reservation_time
+  );
   const arr = reservation_time.split(":");
 
   if (!reservation_time.includes(":")) {
@@ -27,7 +32,7 @@ function isATime(req, res, next) {
   }
   next();
 }
-
+//reservatons
 const validProperties = [
   "first_name",
   "last_name",
@@ -40,8 +45,10 @@ const validProperties = [
 //people is a number?
 function PeopleNumber(req, res, next) {
   let { data: { people } = {} } = req.body;
+  console.log("3---peopleNumber,reservations,ln48,people=>", people);
 
   if (!people || typeof people !== "number" || people < 1) {
+    // console.log("NotPeeple");
     return next({
       status: 400,
       message: "people in party must be a number",
@@ -62,12 +69,14 @@ function PeopleNumber(req, res, next) {
 
 function hasOnlyValidProperties(req, res, next) {
   const { data = {} } = req.body;
+  console.log("2-------ln72,reservationMiddleware,hasonlyValid,data=>", data);
 
   const invalidFields = Object.keys(data).filter(
     (field) => !validProperties.includes(field)
   );
 
   if (invalidFields.length) {
+    console.log("ifinvalidLength", invalidFields.length);
     return next({
       status: 400,
       message: `Invalid field(s): ${invalidFields.join(", ")}`,
@@ -81,7 +90,7 @@ const properties = hasProperties(...validProperties);
 //------------isTuesday-------------
 function isTuesday(req, res, next) {
   let reqData = req.body.data.reservation_date.split("-");
-
+  console.log("6----ln93,isTues,resMiddle,reqData=>", reqData);
   let year = reqData[0];
   let month = reqData[1];
   let day = reqData[2];
@@ -101,6 +110,7 @@ function isTuesday(req, res, next) {
 
 //-----------------ReservationIsInPast?----------------
 function isPast(req, res, next) {
+  console.log("7----isPast,ln113");
   let current = new Date();
 
   let reqData = req.body.data.reservation_date,
@@ -108,6 +118,7 @@ function isPast(req, res, next) {
 
   resDate = new Date(Number(rDate[0]), Number(rDate[1]), Number(rDate[2]));
   if (current.getTime() > resDate.getTime()) {
+    console.log("ln121,curTime>resTime");
     next({
       message: "Reservations can only be created in the future",
       status: 400,
@@ -119,6 +130,7 @@ function isPast(req, res, next) {
 }
 // --------------reservation times are correct?------------------------
 function correctOpenTimes(req, res, next) {
+  console.log("8------correctOpenTimes");
   let rTime = req.body.data.reservation_time.split(":");
 
   console.log(rTime, "rTime");
@@ -132,6 +144,7 @@ function correctOpenTimes(req, res, next) {
 
   //if before 10:30 am
   if (Number(rNumber) < 1030) {
+    console.log("before1030");
     next({
       message: "before 10:30am restaurant is closed.",
       status: 400,
@@ -139,6 +152,7 @@ function correctOpenTimes(req, res, next) {
   }
   //if after 930 pm
   if (Number(rNumber) > 2130) {
+    console.log("rNum>2130");
     next({
       message:
         "Cannot make reservations after 9:30. Restaurant closes at 10:30pm.",
@@ -148,6 +162,7 @@ function correctOpenTimes(req, res, next) {
 
   //if time is past or less than current time
   if (rNumber < cNumber) {
+    console.log("rnum<cNum");
     next({
       message: "cannot make reservations in the past",
       status: 400,

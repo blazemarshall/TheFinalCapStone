@@ -80,7 +80,7 @@ export default function NewReservationForm({
             </div>
             <div>
               <input
-                // id="people"
+                id="people"
                 name="people"
                 required
                 type="number"

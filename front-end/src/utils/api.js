@@ -31,17 +31,21 @@ headers.append("Content-Type", "application/json");
  */
 async function fetchJson(url, options, onCancel) {
   try {
+    console.log("fetchJson start");
     const response = await fetch(url, options);
+    console.log("fetchJson 2");
 
     if (response.status === 204) {
       return null;
     }
 
+    console.log("fetchJson 3");
     const payload = await response.json();
 
     if (payload.error) {
       return Promise.reject({ message: payload.error });
     }
+    console.log("fetchJson end");
     return payload.data;
   } catch (error) {
     if (error.name !== "AbortError") {
@@ -58,6 +62,40 @@ async function fetchJson(url, options, onCancel) {
  *  a promise that resolves to a possibly empty array of reservation saved in the database.
  */
 
+//--------------------tables-----------------------------
+export async function listTables(params, signal) {
+  const url = new URL(`${API_BASE_URL}/tables`);
+  // Object.entries(params).forEach(([key, value]) =>
+  //   url.searchParams.append(key, value.toString())
+  // );
+  return await fetchJson(url, { headers, signal }, []);
+  // .then(formatReservationDate)
+  // .then(formatReservationTime);
+}
+
+export async function updateTableList(params, signal) {
+  const url = new URL(`${API_BASE_URL}/tables`);
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ params }),
+    signal,
+  };
+  return await fetchJson(url, options);
+}
+export async function createTable(table, signal) {
+  console.log("it made it to the create tableApiFunct");
+  const url = new URL(`${API_BASE_URL}/tables`);
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ data: table }),
+    signal,
+  };
+  console.log("tableApiFunct end", table, url);
+  return await fetchJson(url, options);
+}
+//------------------reservations----------------------------------
 export async function listReservations(params, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
   Object.entries(params).forEach(([key, value]) =>
@@ -78,3 +116,4 @@ export async function createReservation(reservation, signal) {
   };
   return await fetchJson(url, options);
 }
+//-----------------------------------------------------------
