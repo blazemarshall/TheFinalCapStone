@@ -1,6 +1,6 @@
 import React from "react";
 import ErrorAlert from "../ErrorAlert";
-
+//-------------------------------------------------------
 export default function NewReservationForm({
   changeHandlerNum,
   submitHandler,
@@ -9,6 +9,7 @@ export default function NewReservationForm({
   apiErrors,
   history,
 }) {
+  //---------------------
   return (
     <div>
       <h1>Create Reservation</h1>

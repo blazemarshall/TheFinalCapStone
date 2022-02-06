@@ -5,8 +5,9 @@ export default function TableForm({
   changeHandler,
   tableSubmitHandler,
   apiTableErrors,
+  numChangeHandler,
 }) {
-  console.log("TableForm");
+  //--------------------------------------------------
   return (
     <div>
       <h1>Create Table</h1>
@@ -31,7 +32,7 @@ export default function TableForm({
               type="number"
               min="1"
               placeholder="Minimum of 1 seat."
-              onChange={changeHandler}
+              onChange={numChangeHandler}
             />
           </div>
         </div>
@@ -45,9 +46,7 @@ export default function TableForm({
           </button>
         </div>
       </form>
-      {/* <div> */}
       <ErrorAlert error={apiTableErrors} />
-      {/* </div> */}
     </div>
   );
 }

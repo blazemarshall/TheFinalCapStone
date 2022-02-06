@@ -1,3 +1,5 @@
+const { capacity } = require("../../Routes/tables/tables.middleWareValidation");
+
 exports.up = function (knex) {
   return knex.schema.createTable("reservations", (table) => {
     table.increments("reservation_id").primary();
@@ -6,7 +8,9 @@ exports.up = function (knex) {
     table.string("mobile_number");
     table.string("reservation_date");
     table.string("reservation_time");
+    table.string("table_id");
     table.integer("people");
+    table.string("status");
     table.timestamps(true, true);
   });
 };

@@ -1,4 +1,3 @@
-// const asyncErrorBoundary = require("../../errors/asyncErrorBoundary");
 const service = require("./tables.service");
 const asyncEB = require("../../errors/asyncErrorBoundary");
 const hasProperties = require("../../errors/hasProperties");
@@ -6,9 +5,17 @@ const {
   tableName,
   capacity,
   tableExists,
-  capacityANumber,
+  verifyTableDataExists,
+  checkCapacityOfTable,
+  resExists,
+  validateResId,
+  tableOccupied,
 } = require("./tables.middleWareValidation");
+const {
+  reservationExists,
+} = require("../reservations/reservations.middleWareValidation");
 
+// ----------------------list---------------------------------------
 async function list(req, res, next) {
   try {
     const data = await service.list();
@@ -18,28 +25,51 @@ async function list(req, res, next) {
   }
 }
 
+//---------------------create---------------------------------------
 async function create(req, res, next) {
-  console.log("createFunct cntrllr,req,body.data", req.body.data);
   const data = await service.create(req.body.data);
   res.status(201).json({ data });
 }
 
-//update function
+//---------------------update---------------------------------------
 async function update(req, res, next) {
-  //   const updatedTable = {
-  //     ...req.body.data,
-  //     table_id: res.locals.something,
-  //     capacity:
-  // };
-  const table = await service.update(updatedTable);
-  res.json({ data: table });
+  console.log(res.locals, "updatedCont");
+  const { reservation, table } = res.locals;
+  // table[reservation.reservation_id] = reservation.reservation_id;
+  console.log(table, reservation.reservation_id, "LOOOK");
+  const data = await service.update(reservation.reservation_id, table);
+  res.json({ data });
 }
-let params = ["capacity", "table_name"];
 
+//-----------------hasProperties------------------------------------
+let params = ["capacity", "table_name"];
 let properties = hasProperties(...params);
 
+//------us-05--------------delete----------------------------------------
+// async function destroy(req, res, next) {
+//   const { reservation_id } = res.locals.reservation;
+//   await service.destroy(reservation_id);
+//   res.sendStatus(204);
+// }
+
+//--------------------exports---------------------------------------
 module.exports = {
   list: asyncEB(list),
-  post: [properties, tableName, capacity, capacityANumber, asyncEB(create)],
-  // update: [tableExists, asyncEB(update)],
+  create: [properties, tableName, capacity, asyncEB(create)],
+  update: [
+    //4
+    verifyTableDataExists,
+    validateResId,
+    asyncEB(resExists),
+    //5
+    asyncEB(tableExists),
+    tableOccupied,
+    //6
+    //7
+    checkCapacityOfTable,
+    //8
+    asyncEB(update),
+  ],
+
+  // delete: [asyncEB(tableExists), tableOccupied, asyncEB(destroy)],
 };

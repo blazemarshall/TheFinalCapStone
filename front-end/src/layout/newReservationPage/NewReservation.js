@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { createReservation } from "../../utils/api";
 import NewReservationForm from "./NewReservationForm";
-
+//-------------------------------------------------------------------
 export default function NewReservation({ reservationsError }) {
   const history = useHistory();
   const initialReservationFields = {
@@ -15,7 +15,7 @@ export default function NewReservation({ reservationsError }) {
   };
   const [apiErrors, setApiErrors] = useState(null);
   const [formData, setFormData] = useState(initialReservationFields);
-
+  //----------------------------------------------------------------------
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -26,7 +26,7 @@ export default function NewReservation({ reservationsError }) {
       [name]: Number(value),
     }));
   }
-
+  // -----------------------------------------------------------------
   async function submitHandler(e) {
     e.preventDefault();
     const controller = new AbortController();
@@ -44,7 +44,7 @@ export default function NewReservation({ reservationsError }) {
     }
     return () => controller.abort();
   }
-
+  // ------------------------------------------------------------------
   return (
     <div>
       <NewReservationForm

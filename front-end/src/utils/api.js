@@ -29,23 +29,20 @@ headers.append("Content-Type", "application/json");
  *  a promise that resolves to the `json` data or an error.
  *  If the response is not in the 200 - 399 range the promise is rejected.
  */
+
+// 3
 async function fetchJson(url, options, onCancel) {
   try {
-    console.log("fetchJson start");
     const response = await fetch(url, options);
-    console.log("fetchJson 2");
-
     if (response.status === 204) {
       return null;
     }
 
-    console.log("fetchJson 3");
     const payload = await response.json();
 
     if (payload.error) {
       return Promise.reject({ message: payload.error });
     }
-    console.log("fetchJson end");
     return payload.data;
   } catch (error) {
     if (error.name !== "AbortError") {
@@ -63,28 +60,27 @@ async function fetchJson(url, options, onCancel) {
  */
 
 //--------------------tables-----------------------------
-export async function listTables(params, signal) {
+//used in dashboard
+export async function listTables(signal) {
   const url = new URL(`${API_BASE_URL}/tables`);
-  // Object.entries(params).forEach(([key, value]) =>
-  //   url.searchParams.append(key, value.toString())
-  // );
   return await fetchJson(url, { headers, signal }, []);
-  // .then(formatReservationDate)
-  // .then(formatReservationTime);
 }
-
-export async function updateTableList(params, signal) {
-  const url = new URL(`${API_BASE_URL}/tables`);
+// 2 used in readReservation component
+export async function updateResIdForTable(formData, signal) {
+  console.log(formData, "formdataTables");
+  const url = new URL(`${API_BASE_URL}/tables/${formData.table_id}/seat`);
   const options = {
     method: "PUT",
     headers,
-    body: JSON.stringify({ params }),
+    body: JSON.stringify({ data: formData }),
     signal,
   };
-  return await fetchJson(url, options);
+  console.log(options, "options");
+  return await fetchJson(url, options, {});
 }
+
+// used in newTable component
 export async function createTable(table, signal) {
-  console.log("it made it to the create tableApiFunct");
   const url = new URL(`${API_BASE_URL}/tables`);
   const options = {
     method: "POST",
@@ -92,10 +88,10 @@ export async function createTable(table, signal) {
     body: JSON.stringify({ data: table }),
     signal,
   };
-  console.log("tableApiFunct end", table, url);
-  return await fetchJson(url, options);
+  return await fetchJson(url, options, {});
 }
 //------------------reservations----------------------------------
+//used in dashboard
 export async function listReservations(params, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
   Object.entries(params).forEach(([key, value]) =>
@@ -105,7 +101,7 @@ export async function listReservations(params, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
-
+//used in newReservation component
 export async function createReservation(reservation, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
   const options = {
@@ -115,5 +111,23 @@ export async function createReservation(reservation, signal) {
     signal,
   };
   return await fetchJson(url, options);
+}
+// examine where im located
+export async function readReservation(reservationId, signal) {
+  const url = `${API_BASE_URL}/decks/${reservationId}`;
+  return await fetchJson(url, { signal }, {});
+}
+
+// 2 - used in readReservation component
+export async function updateTableIdForRes(formData, signal) {
+  console.log(formData, "fordatad;lkj Yeah00000000");
+  const url = `${API_BASE_URL}/reservations/${formData.reservation_id}`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data: formData }),
+    signal,
+  };
+  return await fetchJson(url, options, {});
 }
 //-----------------------------------------------------------
