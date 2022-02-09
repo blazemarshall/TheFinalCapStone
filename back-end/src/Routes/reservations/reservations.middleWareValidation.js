@@ -3,7 +3,7 @@ const service = require("./reservations.service");
 
 //-------------reservationDate is a date?---------------------------------------
 function DateCorrectFormat(req, res, next) {
-  const { data: { reservation_date } = {} } = req.body;
+  const { reservation_date } = req.body.data;
   const regex = /\d{4}-\d{2}-\d{2}/;
   if (!regex.test(reservation_date)) {
     next({
@@ -16,7 +16,7 @@ function DateCorrectFormat(req, res, next) {
 
 //------------reservationTime is a time?----------------------------------------
 function isATime(req, res, next) {
-  const { data: { reservation_time } = {} } = req.body;
+  const { reservation_time } = req.body.data;
   const arr = reservation_time.split(":");
 
   if (!reservation_time.includes(":")) {
@@ -30,7 +30,7 @@ function isATime(req, res, next) {
 
 //----------------people is a number?----------------------------------------------
 function PeopleNumber(req, res, next) {
-  let { data: { people } = {} } = req.body;
+  let { people } = req.body.data;
 
   if (!people || typeof people !== "number" || people < 1) {
     return next({
@@ -49,6 +49,7 @@ const validProperties = [
   "reservation_date",
   "reservation_time",
   "people",
+  "status",
 ];
 
 //--------------------------------------------------------------------------------
@@ -144,36 +145,71 @@ function correctOpenTimes(req, res, next) {
   next();
 }
 //-----------------reservation exists?-----------------------------------------
+
+//uses reqParams
 async function reservationExists(req, res, next) {
-  console.log("made it to originalExists");
+  console.log("makes it to reservationEXists", req.body);
   const reservation = await service.read(req.params.reservation_id);
-  const table = req.body.data;
-  console.log("table", req.body, "table");
   if (reservation) {
     res.locals.reservation = reservation;
-    res.locals.table = table;
     return next();
   }
-  next({ status: 404, message: `reservation cannot be found.` });
+  next({
+    status: 404,
+    message: `reservation ${req.params.reservation_id} cannot be found.`,
+  });
 }
-
+//uses reqBody
 async function reservationExistsForUpdate(req, res, next) {
-  console.log("made it to resExisits", req.body.data);
-
   const reservation = await service.read(req.body.data.reservation_id);
-  // const table = req.body.table_id;
-  console.log("table", req.body.data.table_id, reservation, "table");
   if (reservation) {
     res.locals.reservation = reservation;
     // res.locals.table = table;
     return next();
   }
-  next({ status: 404, message: `reservation cannot be found.` });
+  next({
+    status: 404,
+    message: `reservation ${req.body.data.reservation_id} cannot be found.`,
+  });
+}
+//statuschecker
+function statusCheckReq(req, res, next) {
+  if (req.body.data.status === "finished") {
+    next({
+      message: "Status can't be finished",
+      status: 400,
+    });
+  }
+  if (req.body.data.status !== "booked") {
+    next({
+      message: `Status can not be ${req.body.data.status}`,
+      status: 400,
+    });
+  }
+  next();
+}
+function statusCheckReservation(req, res, next) {
+  const { reservation } = res.locals;
+  if (reservation.status === "finished") {
+    next({
+      message: "Reservation cannot be finished",
+      status: 400,
+    });
+  }
+  if (req.body.data.status === "seated") {
+    next({
+      message: "status already seated",
+      status: 400,
+    });
+  }
+  next();
 }
 
 //-----------------------exports--------------------------------------------
 module.exports = {
   DateCorrectFormat,
+  statusCheckReservation,
+  statusCheckReq,
   isATime,
   isPast,
   isTuesday,

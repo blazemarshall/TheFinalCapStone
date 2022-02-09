@@ -15,14 +15,31 @@ const {
   correctOpenTimes,
   reservationExists,
   reservationExistsForUpdate,
+  statusCheck,
+  statusCheckReq,
+  statusCheckReservation,
 } = require("./reservations.middleWareValidation");
 
 //-----------------list---------------------------------------------
 async function list(req, res, next) {
-  let { date } = req.query;
-  const data = await service.list(date);
-  res.json({ data });
+  try {
+    if (req.query.mobile_number) {
+      const data = await service.phoneNumberList(req.query.mobile_number);
+      if (!data) {
+        throw new Error("No reservations found");
+      }
+      res.json({ data });
+    } else {
+      const data = await service.list(req.query.date);
+      res.json({ data });
+    }
+  } catch (error) {
+    next(error);
+  }
 }
+//make phone list
+// async function
+
 //-----------------create-------------------------------------------
 
 async function create(req, res, next) {
@@ -41,23 +58,30 @@ async function read(req, res) {
 
 ///update needs table id from table dropdown
 async function update(req, res) {
-  console.log("made it further");
-
-  const { reservation_id } = res.locals.reservation;
-  console.log(reservation_id, req.body.data, "looooogggggeeeed");
-  // updatedReservation
-  const updatedReservation = {
-    table_id: req.body.data.table_id,
-  };
-  console.log(updatedReservation);
-  await service.update(updatedReservation, reservation_id);
+  const { reservation } = res.locals;
+  await service.update(
+    reservation,
+    reservation.reservation_id,
+    req.body.data.status
+  );
+  res.sendStatus(200);
+  // res.json({ data: { status: reservation.status } });
+}
+async function updatedStatus(req, res) {
+  const { status } = req.body.data;
+  const { reservation } = res.locals;
+  console.log(status, reservation, "updateStatusResCont");
+  reservation.status = status;
+  await service.updateStatusInService(reservation);
+  res.sendStatus(200);
 }
 //-------------------exports----------------------------------------
 
 module.exports = {
-  list: asyncEB(list),
+  list: [asyncEB(list)],
   create: [
     properties,
+    statusCheckReq,
     hasOnlyValidProperties,
     PeopleNumber,
     DateCorrectFormat,
@@ -68,5 +92,13 @@ module.exports = {
     asyncEB(create),
   ],
   read: [asyncEB(reservationExists), asyncEB(read)],
+  //updates seat assignment
   update: [reservationExistsForUpdate, asyncEB(update)],
+  //updates status assignment
+  updateStatus: [
+    reservationExists,
+    statusCheckReservation,
+    statusCheckReq,
+    asyncEB(updatedStatus),
+  ],
 };

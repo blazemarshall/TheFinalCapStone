@@ -15,10 +15,10 @@ function create(newTable) {
 
 // ----------------------update----------------------------------
 //update  check me
-function update(resId, table) {
-  table.reservation_id = resId;
+function update(table) {
+  console.log(table, "UPDATE TABLES SERVICE");
+  // table.reservation_id = resId;
 
-  console.log(resId, table.reservation_id, "made it to update service");
   return knex("tables").update(table, "*").where({ table_id: table.table_id });
 }
 
@@ -31,9 +31,16 @@ function read(table_id) {
 }
 
 // ----------------------destroy---------------------------------
-function destroy(statusNull, table) {
-  //update is better. Yeah, I said it.
-  return knex("tables").update(statusNull).where({ status: table.status });
+function destroy(table) {
+  console.log(table, "destroyTablesService1010101010101");
+  let pnter = table.reservation_id;
+  table.reservation_id = "null";
+  // return knex("tables").update(table).where({ table_id: table.table_id });
+  return knex.raw(
+    `update tables set reservation_id=null where table_id=${table.table_id}
+    `
+  );
+  //  and reservation_id=${pnter}
 }
 
 // ----------------------exports---------------------------------
@@ -43,4 +50,5 @@ module.exports = {
   update,
   list,
   read,
+  destroy,
 };
