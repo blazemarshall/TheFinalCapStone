@@ -32,17 +32,19 @@ headers.append("Content-Type", "application/json");
 
 // 3
 async function fetchJson(url, options, onCancel) {
+  console.log(options, "options{");
   try {
     const response = await fetch(url, options);
     if (response.status === 204) {
+      console.log("response is a goodone");
       return null;
     }
-
     const payload = await response.json();
-
     if (payload.error) {
+      console.log("problems, payLoad");
       return Promise.reject({ message: payload.error });
     }
+    console.log("fetchJson end");
     return payload.data;
   } catch (error) {
     if (error.name !== "AbortError") {
@@ -66,8 +68,8 @@ export async function listTables(signal) {
   return await fetchJson(url, { headers, signal }, []);
 }
 // 2 used in readReservation component
-export async function updateResIdForTable(formData, signal) {
-  console.log(formData, "formdataTables");
+export async function updateIdsForTableAndRes(formData, signal) {
+  console.log("updateResIDForTabole api", formData, "formData");
   const url = new URL(`${API_BASE_URL}/tables/${formData.table_id}/seat`);
   const options = {
     method: "PUT",
@@ -90,6 +92,35 @@ export async function createTable(table, signal) {
   };
   return await fetchJson(url, options, {});
 }
+
+//used in dashboard.js component to delete resId from table
+// changes status of table to free and status of res to finished
+export async function deleteHandlerForTableResId(tableId, resId, signal) {
+  console.log("deleteHandleFor TableResId", tableId, resId);
+  const url = new URL(`${API_BASE_URL}/tables/${tableId}/seat`);
+  const options = {
+    method: "DELETE",
+    headers,
+    body: JSON.stringify({
+      data: { table_id: tableId, reservation_id: resId },
+    }),
+    signal,
+  };
+  console.log("Made it to end of deleteHanderFOrTableResID");
+  return await fetchJson(url, options, {});
+}
+export async function deleteHandlerForResStatus(resId, signal) {
+  console.log(resId, "deleteHandleforResStatus");
+  const url = new URL(`${API_BASE_URL}/reservations/${resId}/status`);
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data: { status: "finished" } }),
+    signal,
+  };
+  return await fetchJson(url, options, {});
+}
+
 //------------------reservations----------------------------------
 //used in dashboard
 export async function listReservations(params, signal) {
@@ -113,21 +144,22 @@ export async function createReservation(reservation, signal) {
   return await fetchJson(url, options);
 }
 // examine where im located
-export async function readReservation(reservationId, signal) {
-  const url = `${API_BASE_URL}/decks/${reservationId}`;
+export async function reservationGrab(reservationId, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservationId}`;
   return await fetchJson(url, { signal }, {});
 }
 
-// 2 - used in readReservation component
-export async function updateTableIdForRes(formData, signal) {
-  console.log(formData, "fordatad;lkj Yeah00000000");
-  const url = `${API_BASE_URL}/reservations/${formData.reservation_id}`;
+//used in dashboard
+export async function updateSeatedStatusForRes(resId, signal) {
+  console.log(resId, "updatedSeatedStatusForResAPI");
+  const url = new URL(`${API_BASE_URL}/reservations/${resId}/status`);
   const options = {
     method: "PUT",
     headers,
-    body: JSON.stringify({ data: formData }),
+    body: JSON.stringify({ data: { status: "seated" } }),
     signal,
   };
   return await fetchJson(url, options, {});
 }
+
 //-----------------------------------------------------------

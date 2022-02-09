@@ -61,12 +61,12 @@ function capacitySize(req, res, next) {
 // =========get=====================
 //200 for existing id for read
 //fix me
+
 async function tableExists(req, res, next) {
-  console.log(req.body, "tableExists");
   const table = await service.read(req.params.table_id);
   if (!table) {
     next({
-      message: `table ${req.params.table_id} is undefined`,
+      message: `table ${req.params.table_id} does not exist`,
       status: 404,
     });
   }
@@ -98,9 +98,14 @@ function verifyTableDataExists(req, res, next) {
 //resExists found in tablecontrollerExport
 
 async function resExists(req, res, next) {
-  console.log("resExists", req.body);
   try {
     const { reservation_id } = req.body.data;
+    if (!reservation_id) {
+      next({
+        message: "must have a reservation_id",
+        status: 400,
+      });
+    }
     res.locals.reservation = await resService.read(reservation_id);
     if (!res.locals.reservation) {
       next({

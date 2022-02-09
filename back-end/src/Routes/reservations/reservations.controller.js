@@ -70,7 +70,6 @@ async function update(req, res) {
 async function updatedStatus(req, res) {
   const { status } = req.body.data;
   const { reservation } = res.locals;
-  console.log(status, reservation, "updateStatusResCont");
   reservation.status = status;
   await service.updateStatusInService(reservation);
   res.sendStatus(200);
@@ -82,7 +81,6 @@ module.exports = {
   create: [
     properties,
     statusCheckReq,
-    hasOnlyValidProperties,
     PeopleNumber,
     DateCorrectFormat,
     isATime,

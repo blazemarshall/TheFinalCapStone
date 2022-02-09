@@ -39,7 +39,6 @@ async function create(req, res, next) {
 async function update(req, res, next) {
   try {
     const { reservation, table } = res.locals;
-    reservation.table_id = table.table_id;
     table.reservation_id = reservation.reservation_id;
     //--------saves reservationId to table------------------
     await service.update(table);
@@ -47,7 +46,7 @@ async function update(req, res, next) {
     await resService.update(reservation, table);
     res.sendStatus(200);
   } catch (error) {
-    console.log(error, "tableContUpdate");
+    console.error(error);
   }
 }
 
@@ -57,15 +56,13 @@ let properties = hasProperties(...params);
 
 //------us-05--------------delete-----------------------------------
 async function destroy(req, res, next) {
-  const { table, reservation } = res.locals;
+  const { table } = res.locals;
   // const { status } = req.body.data;
   // reservation.status = status;
 
-  console.log("RESLOCALS>", reservation, table, "<res.locals");
   // await resService.updateStatusInService(reservation);
-  console.log("made it after resServiceCall");
   await service.destroy(table);
-  // res.sendStatus(200);
+  res.sendStatus(200);
 }
 
 //--------------------exports---------------------------------------
@@ -73,19 +70,19 @@ module.exports = {
   list: asyncEB(list),
   create: [properties, tableName, capacity, asyncEB(create)],
   update: [
+    verifyTableDataExists,
     asyncEB(tableExists),
     asyncEB(resExists),
-    // verifyTableDataExists,
-    // validateFormResId,
-    // tableOccupied,
-    // checkCapacityOfTable,
+    validateFormResId,
+    tableOccupied,
+    checkCapacityOfTable,
     asyncEB(update),
   ],
 
   delete: [
     asyncEB(tableExists),
-    asyncEB(resExists),
-    //  tableNeedsToBeOccupied,
+    // asyncEB(resExists),
+    tableNeedsToBeOccupied,
     asyncEB(destroy),
   ],
 };

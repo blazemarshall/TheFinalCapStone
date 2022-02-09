@@ -49,7 +49,6 @@ const validProperties = [
   "reservation_date",
   "reservation_time",
   "people",
-  "status",
 ];
 
 //--------------------------------------------------------------------------------
@@ -172,15 +171,15 @@ async function reservationExistsForUpdate(req, res, next) {
     message: `reservation ${req.body.data.reservation_id} cannot be found.`,
   });
 }
+// if (req.body.data.status === "finished") {
+//   next({
+//     message: "Status can't be finished",
+//     status: 400,
+//   });
+// }
 //statuschecker
 function statusCheckReq(req, res, next) {
-  if (req.body.data.status === "finished") {
-    next({
-      message: "Status can't be finished",
-      status: 400,
-    });
-  }
-  if (req.body.data.status !== "booked") {
+  if (req.body.data.status && req.body.data.status !== "booked") {
     next({
       message: `Status can not be ${req.body.data.status}`,
       status: 400,
@@ -188,6 +187,8 @@ function statusCheckReq(req, res, next) {
   }
   next();
 }
+
+//--------------------------------------------------
 function statusCheckReservation(req, res, next) {
   const { reservation } = res.locals;
   if (reservation.status === "finished") {

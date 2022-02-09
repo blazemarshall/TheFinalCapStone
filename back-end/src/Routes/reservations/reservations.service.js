@@ -35,16 +35,8 @@ function read(resId) {
     .then((result) => result[0]);
 }
 // -----------update---------------------------
-//status identifier decides if seated or finished is saved for res status.
-// if (status === "seated") {
-//   reservation.status = "seated";
-// }
-// if (status === "finished") {
-//   reservation.status = "finished";
-// }
 //updates table assignment to reservation
 function update(reservation, table) {
-  // reservation.table_id = table.table_id;
   return knex("reservations")
     .update(reservation, "*")
     .where({ reservation_id: reservation.reservation_id });
