@@ -84,6 +84,7 @@ async function tableExists(req, res, next) {
 
 //returns 400 if data missing
 function verifyTableDataExists(req, res, next) {
+  console.log(req.body.data, req.params, "<LOOK");
   if (!req.body.data) {
     next({
       message: "data is missing",
@@ -171,6 +172,18 @@ function validateFormResId(req, res, next) {
   next();
 }
 
+function resAlreadySeated(req, res, next) {
+  const { reservation } = res.locals;
+  console.log(reservation, req.body, "resAlreadySeated");
+  if (reservation.status == "seated") {
+    next({
+      message: "reservation already seated",
+      status: 400,
+    });
+  }
+  next();
+}
+
 // --------------------------------exports-----------------------------------------
 module.exports = {
   capacity,
@@ -183,4 +196,5 @@ module.exports = {
   checkCapacityOfTable,
   verifyTableDataExists,
   tableNeedsToBeOccupied,
+  resAlreadySeated,
 };

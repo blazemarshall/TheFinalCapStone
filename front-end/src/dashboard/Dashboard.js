@@ -154,9 +154,7 @@ function Dashboard({ dateParam, tables, setTables, refresh, setRefresh }) {
     let status = "seated";
     console.log(resId, "RES ID");
     //   //when clicked set status to seated
-    await updateSeatedStatusForRes(resId, acc.signal).then(
-      history.push(`/reservations/${resId}/seat`)
-    );
+    history.push(`/reservations/${resId}/seat`);
   }
 
   //finishHandler
@@ -176,12 +174,13 @@ function Dashboard({ dateParam, tables, setTables, refresh, setRefresh }) {
             tableId,
             reservation_id,
             abortedCommand.signal
-          ).catch(console.log);
+          )
+            .then(() => history.go(0))
+            .catch(console.log);
           console.log("does it make it past tableResID?????");
-          // await deleteHandlerForResStatus(reservation_id, ac.signal).then(
+          // await deleteHandlerForResStatus(reservation_id, ac.signal)
+          // .then(
           // setRefresh(!refresh);
-          // );
-          // .then(history.go(0));
         } else {
         }
       } catch (error) {

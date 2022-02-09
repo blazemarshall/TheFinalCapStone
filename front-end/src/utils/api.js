@@ -32,19 +32,15 @@ headers.append("Content-Type", "application/json");
 
 // 3
 async function fetchJson(url, options, onCancel) {
-  console.log(options, "options{");
   try {
     const response = await fetch(url, options);
     if (response.status === 204) {
-      console.log("response is a goodone");
       return null;
     }
     const payload = await response.json();
     if (payload.error) {
-      console.log("problems, payLoad");
       return Promise.reject({ message: payload.error });
     }
-    console.log("fetchJson end");
     return payload.data;
   } catch (error) {
     if (error.name !== "AbortError") {
@@ -69,7 +65,7 @@ export async function listTables(signal) {
 }
 // 2 used in readReservation component
 export async function updateIdsForTableAndRes(formData, signal) {
-  console.log("updateResIDForTabole api", formData, "formData");
+  console.log(formData, "UpdateIDSTABLERES");
   const url = new URL(`${API_BASE_URL}/tables/${formData.table_id}/seat`);
   const options = {
     method: "PUT",
@@ -77,12 +73,12 @@ export async function updateIdsForTableAndRes(formData, signal) {
     body: JSON.stringify({ data: formData }),
     signal,
   };
-  console.log(options, "options");
   return await fetchJson(url, options, {});
 }
 
 // used in newTable component
 export async function createTable(table, signal) {
+  console.log(table, "createable");
   const url = new URL(`${API_BASE_URL}/tables`);
   const options = {
     method: "POST",
@@ -96,7 +92,6 @@ export async function createTable(table, signal) {
 //used in dashboard.js component to delete resId from table
 // changes status of table to free and status of res to finished
 export async function deleteHandlerForTableResId(tableId, resId, signal) {
-  console.log("deleteHandleFor TableResId", tableId, resId);
   const url = new URL(`${API_BASE_URL}/tables/${tableId}/seat`);
   const options = {
     method: "DELETE",
@@ -106,11 +101,9 @@ export async function deleteHandlerForTableResId(tableId, resId, signal) {
     }),
     signal,
   };
-  console.log("Made it to end of deleteHanderFOrTableResID");
   return await fetchJson(url, options, {});
 }
 export async function deleteHandlerForResStatus(resId, signal) {
-  console.log(resId, "deleteHandleforResStatus");
   const url = new URL(`${API_BASE_URL}/reservations/${resId}/status`);
   const options = {
     method: "PUT",
@@ -151,7 +144,6 @@ export async function reservationGrab(reservationId, signal) {
 
 //used in dashboard
 export async function updateSeatedStatusForRes(resId, signal) {
-  console.log(resId, "updatedSeatedStatusForResAPI");
   const url = new URL(`${API_BASE_URL}/reservations/${resId}/status`);
   const options = {
     method: "PUT",

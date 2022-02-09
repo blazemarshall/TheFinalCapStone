@@ -5,7 +5,7 @@ import { createTable } from "../../utils/api";
 //-----------------------------------------------
 export default function NewTable() {
   const initialTableForm = {
-    table_name: 0,
+    table_name: "",
     capacity: 0,
   };
   const history = useHistory();
@@ -20,25 +20,25 @@ export default function NewTable() {
   //----------------------------------------------
   async function tableSubmitHandler(e) {
     e.preventDefault();
-    mounted = true;
     const controller = new AbortController();
     try {
-      await createTable(tableFormData, controller.signal);
-      if (mounted) {
-        await setTableFormData({ ...initialTableForm }).then(history.go(-1));
-      }
+      // await createTable(tableFormData, controller.signal);
+
+      setTableFormData(initialTableForm);
+      history.push("/dashboard");
     } catch (error) {
       console.log(error);
-      await setApiTableErrors(error);
+      // await setApiTableErrors(error);
     }
-    mounted = false;
     return () => controller.abort();
   }
   //----------------------------------------------
   const changeHandler = (e) => {
+    console.log(e.target.value, "dog");
     setTableFormData({ ...tableFormData, [e.target.name]: e.target.value });
   };
   const numChangeHandler = (e) => {
+    console.log(e.target.value);
     setTableFormData({
       ...tableFormData,
       [e.target.name]: Number(e.target.value),

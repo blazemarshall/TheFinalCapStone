@@ -147,7 +147,6 @@ function correctOpenTimes(req, res, next) {
 
 //uses reqParams
 async function reservationExists(req, res, next) {
-  console.log("makes it to reservationEXists", req.body);
   const reservation = await service.read(req.params.reservation_id);
   if (reservation) {
     res.locals.reservation = reservation;
@@ -171,35 +170,39 @@ async function reservationExistsForUpdate(req, res, next) {
     message: `reservation ${req.body.data.reservation_id} cannot be found.`,
   });
 }
-// if (req.body.data.status === "finished") {
-//   next({
-//     message: "Status can't be finished",
-//     status: 400,
-//   });
-// }
+
+//--------------------------------------------------
 //statuschecker
 function statusCheckReq(req, res, next) {
-  if (req.body.data.status && req.body.data.status !== "booked") {
+  if (req.body.data.status == "cancelled") {
+    next();
+  } else {
+    if (req.body.data.status && req.body.data.status !== "booked") {
+      next({
+        message: `Status can not be ${req.body.data.status}`,
+        status: 400,
+      });
+    }
+    next();
+  }
+}
+function unknownStatus(req, res, next) {
+  const { status } = req.body.data;
+  const list = ["seated", "booked", "finished", "cancelled"];
+  if (!list.includes(status)) {
     next({
-      message: `Status can not be ${req.body.data.status}`,
+      message: "status unknown",
       status: 400,
     });
   }
   next();
 }
 
-//--------------------------------------------------
 function statusCheckReservation(req, res, next) {
   const { reservation } = res.locals;
   if (reservation.status === "finished") {
     next({
       message: "Reservation cannot be finished",
-      status: 400,
-    });
-  }
-  if (req.body.data.status === "seated") {
-    next({
-      message: "status already seated",
       status: 400,
     });
   }
@@ -220,4 +223,5 @@ module.exports = {
   correctOpenTimes,
   reservationExists,
   reservationExistsForUpdate,
+  unknownStatus,
 };

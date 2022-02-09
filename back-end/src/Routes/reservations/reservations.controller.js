@@ -18,6 +18,7 @@ const {
   statusCheck,
   statusCheckReq,
   statusCheckReservation,
+  unknownStatus,
 } = require("./reservations.middleWareValidation");
 
 //-----------------list---------------------------------------------
@@ -55,24 +56,17 @@ async function read(req, res) {
 }
 
 //----------------update--------------------------------------------
-
-///update needs table id from table dropdown
 async function update(req, res) {
-  const { reservation } = res.locals;
-  await service.update(
-    reservation,
-    reservation.reservation_id,
-    req.body.data.status
-  );
-  res.sendStatus(200);
-  // res.json({ data: { status: reservation.status } });
+  const reservation = req.body.data;
+  await service.update(reservation);
+  res.status(200).json({ data: reservation });
 }
 async function updatedStatus(req, res) {
   const { status } = req.body.data;
   const { reservation } = res.locals;
   reservation.status = status;
   await service.updateStatusInService(reservation);
-  res.sendStatus(200);
+  res.status(200).json({ data: { status: status } });
 }
 //-------------------exports----------------------------------------
 
@@ -91,12 +85,19 @@ module.exports = {
   ],
   read: [asyncEB(reservationExists), asyncEB(read)],
   //updates seat assignment
-  update: [reservationExistsForUpdate, asyncEB(update)],
+  update: [
+    reservationExists,
+    properties,
+    DateCorrectFormat,
+    PeopleNumber,
+    isATime,
+    asyncEB(update),
+  ],
   //updates status assignment
   updateStatus: [
     reservationExists,
     statusCheckReservation,
-    statusCheckReq,
+    unknownStatus,
     asyncEB(updatedStatus),
   ],
 };

@@ -12,12 +12,12 @@ const {
   validateFormResId,
   tableOccupied,
   tableNeedsToBeOccupied,
+  resAlreadySeated,
 } = require("./tables.middleWareValidation");
 const {
   reservationExists,
 } = require("../reservations/reservations.middleWareValidation");
 
-// ----------------------list---------------------------------------
 async function list(req, res, next) {
   try {
     const data = await service.list();
@@ -27,24 +27,22 @@ async function list(req, res, next) {
   }
 }
 
-//---------------------create---------------------------------------
 async function create(req, res, next) {
   const data = await service.create(req.body.data);
   res.status(201).json({ data });
 }
 
-//---------------------update---------------------------------------
-//put goes to /tables/table_id/seat,
-//  then this updates resId to table and tableId to res.
 async function update(req, res, next) {
   try {
     const { reservation, table } = res.locals;
     table.reservation_id = reservation.reservation_id;
+    reservation.status = "seated";
+    console.log(reservation, table, "Flying bats");
     //--------saves reservationId to table------------------
     await service.update(table);
     //-------saves table assignment to reservation----------
     await resService.update(reservation, table);
-    res.sendStatus(200);
+    res.json({});
   } catch (error) {
     console.error(error);
   }
@@ -57,12 +55,17 @@ let properties = hasProperties(...params);
 //------us-05--------------delete-----------------------------------
 async function destroy(req, res, next) {
   const { table } = res.locals;
-  // const { status } = req.body.data;
-  // reservation.status = status;
-
-  // await resService.updateStatusInService(reservation);
   await service.destroy(table);
-  res.sendStatus(200);
+  //res status updates to finished
+  //grab res
+  await resService.update({
+    reservation_id: table.reservation_id,
+    status: "finished",
+  });
+
+  //save to finished
+  //update
+  res.json({});
 }
 
 //--------------------exports---------------------------------------
@@ -74,15 +77,11 @@ module.exports = {
     asyncEB(tableExists),
     asyncEB(resExists),
     validateFormResId,
+    resAlreadySeated,
     tableOccupied,
     checkCapacityOfTable,
     asyncEB(update),
   ],
 
-  delete: [
-    asyncEB(tableExists),
-    // asyncEB(resExists),
-    tableNeedsToBeOccupied,
-    asyncEB(destroy),
-  ],
+  delete: [asyncEB(tableExists), tableNeedsToBeOccupied, asyncEB(destroy)],
 };

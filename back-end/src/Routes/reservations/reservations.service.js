@@ -36,19 +36,19 @@ function read(resId) {
 }
 // -----------update---------------------------
 //updates table assignment to reservation
-function update(reservation, table) {
+function update(reservation) {
   return knex("reservations")
-    .update(reservation, "*")
-    .where({ reservation_id: reservation.reservation_id });
+    .where({ reservation_id: reservation.reservation_id })
+    .update(reservation, "*");
 }
 function updateStatusInService(reservation) {
-  console.log("Madie it to res serviceupdate");
+  console.log(reservation, "UpdateSatatIn REs");
   return knex("reservations")
-    .update(reservation)
-    .where({ reservation_id: reservation.reservation_id });
+    .where({ reservation_id: reservation.reservation_id })
+    .update(reservation);
 }
 
-function updateStatusToFinished() {}
+// function updateStatusToFinished() {}
 
 //-------------exports-------------------------
 module.exports = {

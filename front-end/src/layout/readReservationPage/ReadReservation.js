@@ -73,8 +73,8 @@ export default function ReadReservation({ refresh, setRefresh, reservations }) {
 
       try {
         await updateIdsForTableAndRes(form, abortC.signal)
-          .then(setForm(initialform))
-          .then(history.push("/dashboard"));
+          .then(() => setForm(initialform))
+          .then(() => history.push("/dashboard"));
         // .then(setRefresh(!refresh));
       } catch (error) {
         setTableListErrors(error);
