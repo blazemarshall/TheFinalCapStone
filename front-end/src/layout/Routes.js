@@ -7,6 +7,7 @@ import { today } from "../utils/date-time";
 import NewReservation from "./newReservationPage/NewReservation.js";
 import NewTable from "./Tables/NewTable";
 import ReadReservation from "./readReservationPage/ReadReservation";
+import Search from "./search/Search";
 /**
  * Defines all the routes for the application.
  *
@@ -16,6 +17,8 @@ import ReadReservation from "./readReservationPage/ReadReservation";
  */
 function Routes() {
   const [tables, setTables] = useState([]);
+  const [refresh, setRefresh] = useState(true);
+
   return (
     <Switch>
       <Route exact={true} path="/">
@@ -24,8 +27,16 @@ function Routes() {
       <Route exact={true} path="/tables/new">
         <NewTable />
       </Route>
+      <Route exact={true} path="/search">
+        <Search />
+      </Route>
       <Route exact={true} path="/reservations/:reservation_id/seat">
-        <ReadReservation tables={tables} setTables={setTables} />
+        <ReadReservation
+          tables={tables}
+          refresh={refresh}
+          setRefresh={setRefresh}
+          setTables={setTables}
+        />
       </Route>
       <Route exact={true} path="/reservations/new">
         <NewReservation />
@@ -33,9 +44,14 @@ function Routes() {
       <Route exact={true} path="/reservations">
         <Redirect to={"/dashboard"} />
       </Route>
-
       <Route path="/dashboard">
-        <Dashboard setTables={setTables} tables={tables} dateParam={today()} />
+        <Dashboard
+          setTables={setTables}
+          refresh={refresh}
+          tables={tables}
+          setRefresh={setRefresh}
+          dateParam={today()}
+        />
       </Route>
       <Route>
         <NotFound />

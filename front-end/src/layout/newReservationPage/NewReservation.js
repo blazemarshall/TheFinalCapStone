@@ -4,6 +4,7 @@ import { createReservation } from "../../utils/api";
 import NewReservationForm from "./NewReservationForm";
 //-------------------------------------------------------------------
 export default function NewReservation({ reservationsError }) {
+  let mounted = false;
   const history = useHistory();
   const initialReservationFields = {
     first_name: "",
@@ -12,36 +13,49 @@ export default function NewReservation({ reservationsError }) {
     reservation_date: "",
     reservation_time: "",
     people: 0,
+    status: "booked",
   };
   const [apiErrors, setApiErrors] = useState(null);
   const [formData, setFormData] = useState(initialReservationFields);
   //----------------------------------------------------------------------
   const changeHandler = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    mounted = true;
+    if (mounted) {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
+    mounted = false;
   };
 
   function changeHandlerNum({ target: { name, value } }) {
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: Number(value),
-    }));
+    mounted = true;
+    if (mounted) {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: Number(value),
+      }));
+    }
+    mounted = false;
   }
   // -----------------------------------------------------------------
   async function submitHandler(e) {
     e.preventDefault();
+    mounted = true;
     const controller = new AbortController();
     try {
       formData.people = Number(formData.people);
       await createReservation(formData, controller.signal);
       const date = formData.reservation_date;
       history.push(`/dashboard?date=${date}`);
-      await setFormData({ ...initialReservationFields });
+      if (mounted) {
+        await setFormData({ ...initialReservationFields });
+      }
     } catch (error) {
       setApiErrors(error);
       console.log(error.status, "status");
 
       throw error;
     }
+    mounted = false;
     return () => controller.abort();
   }
   // ------------------------------------------------------------------

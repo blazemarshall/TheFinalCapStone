@@ -12,9 +12,10 @@ export default function NewTable() {
   const [tableFormData, setTableFormData] = useState(initialTableForm);
   const [apiTableErrors, setApiTableErrors] = useState(null);
   let mounted = false;
-  //fix me
+
+  //--------------------------------------------
   function cancelHandler() {
-    history.goBack();
+    history.go(-1);
   }
   //----------------------------------------------
   async function tableSubmitHandler(e) {
@@ -24,9 +25,8 @@ export default function NewTable() {
     try {
       await createTable(tableFormData, controller.signal);
       if (mounted) {
-        await setTableFormData({ ...initialTableForm });
+        await setTableFormData({ ...initialTableForm }).then(history.go(-1));
       }
-      history.push("/dashboard");
     } catch (error) {
       console.log(error);
       await setApiTableErrors(error);

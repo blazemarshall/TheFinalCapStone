@@ -1,11 +1,23 @@
 const knex = require("../../db/connection");
+const { updateStatus } = require("./reservations.controller");
+const reservationsController = require("./reservations.controller");
 
 //-------------list--------------------------
 function list(date) {
   return knex("reservations")
     .select("*")
-    .where({ reservation_date: date })
+    .whereNot({ status: "finished" })
+    .andWhere({ reservation_date: date })
     .orderBy("reservations.reservation_time");
+}
+
+function phoneNumberList(number) {
+  return knex("reservations")
+    .whereRaw(
+      "translate(mobile_number, '() -', '') like ?",
+      `%${number.replace(/\D/g, "")}%`
+    )
+    .orderBy("reservation_date");
 }
 
 // -----------create-------------------------
@@ -23,17 +35,27 @@ function read(resId) {
     .then((result) => result[0]);
 }
 // -----------update---------------------------
-function update(updatedReservation, resId) {
-  console.log("isitWOrking/????");
+//updates table assignment to reservation
+function update(reservation, table) {
   return knex("reservations")
-    .update(updatedReservation, "*")
-    .where({ reservation_id: resId });
+    .update(reservation, "*")
+    .where({ reservation_id: reservation.reservation_id });
 }
+function updateStatusInService(reservation) {
+  console.log("Madie it to res serviceupdate");
+  return knex("reservations")
+    .update(reservation)
+    .where({ reservation_id: reservation.reservation_id });
+}
+
+function updateStatusToFinished() {}
 
 //-------------exports-------------------------
 module.exports = {
   read,
   create,
   list,
+  phoneNumberList,
   update,
+  updateStatusInService,
 };
