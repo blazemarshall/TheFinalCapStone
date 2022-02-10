@@ -253,7 +253,6 @@ describe("US-06 - Reservation status", () => {
     test("does not include 'finished' reservations", async () => {
       expect(tableOne).not.toBeUndefined();
       expect(reservationOne).not.toBeUndefined();
-      console.log(reservationOne, "Hawk");
       const seatResponse = await request(app)
         .put(`/tables/${tableOne.table_id}/seat`)
         .set("Accept", "application/json")
@@ -269,7 +268,6 @@ describe("US-06 - Reservation status", () => {
 
       expect(finishResponse.body.error).toBeUndefined();
       expect(finishResponse.status).toBe(200);
-      console.log(reservationOne.reservation_date, "gator");
       const reservationsResponse = await request(app)
         .get(
           `/reservations?date=${asDateString(reservationOne.reservation_date)}`

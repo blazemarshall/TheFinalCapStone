@@ -73,18 +73,11 @@ async function tableExists(req, res, next) {
   res.locals.table = table;
   next();
 }
-// async function findTable(req, res, next) {
-//   const table = await service.read();
-//   if (table) {
-//     res.locals.table = table;
-//   }
-// }
 
 //========put=========================
 
 //returns 400 if data missing
 function verifyTableDataExists(req, res, next) {
-  console.log(req.body.data, req.params, "<LOOK");
   if (!req.body.data) {
     next({
       message: "data is missing",
@@ -94,8 +87,6 @@ function verifyTableDataExists(req, res, next) {
   next();
 }
 
-//400 if reservation id is missing
-//404 if res id doesnt exist
 //resExists found in tablecontrollerExport
 
 async function resExists(req, res, next) {
@@ -174,7 +165,6 @@ function validateFormResId(req, res, next) {
 
 function resAlreadySeated(req, res, next) {
   const { reservation } = res.locals;
-  console.log(reservation, req.body, "resAlreadySeated");
   if (reservation.status == "seated") {
     next({
       message: "reservation already seated",

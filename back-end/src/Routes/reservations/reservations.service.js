@@ -42,7 +42,6 @@ function update(reservation) {
     .update(reservation, "*");
 }
 function updateStatusInService(reservation) {
-  console.log(reservation, "UpdateSatatIn REs");
   return knex("reservations")
     .where({ reservation_id: reservation.reservation_id })
     .update(reservation);

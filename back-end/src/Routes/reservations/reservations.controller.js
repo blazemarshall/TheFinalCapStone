@@ -27,7 +27,7 @@ async function list(req, res, next) {
     if (req.query.mobile_number) {
       const data = await service.phoneNumberList(req.query.mobile_number);
       if (!data) {
-        throw new Error("No reservations found");
+        next({ message: "No reservations found", status: 400 });
       }
       res.json({ data });
     } else {

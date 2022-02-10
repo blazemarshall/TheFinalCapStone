@@ -36,8 +36,8 @@ async function update(req, res, next) {
   try {
     const { reservation, table } = res.locals;
     table.reservation_id = reservation.reservation_id;
+
     reservation.status = "seated";
-    console.log(reservation, table, "Flying bats");
     //--------saves reservationId to table------------------
     await service.update(table);
     //-------saves table assignment to reservation----------
