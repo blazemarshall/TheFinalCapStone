@@ -6,11 +6,12 @@ import {
   reservationGrab,
   updateIdsForTableAndRes,
 } from "../../utils/api";
-import ErrorAlert from "../ErrorAlert";
+import ErrorAlert from "../CommonFiles/ErrorAlert";
+import SeatingForm from "../CommonFiles/SeatingForm";
 
 //--------------------------------------------------------
 
-export default function ReadReservation({ refresh, setRefresh, reservations }) {
+export default function ReadReservation({ reservations }) {
   let ready = true;
   let mounted = false;
   const { reservation_id } = useParams();
@@ -52,17 +53,6 @@ export default function ReadReservation({ refresh, setRefresh, reservations }) {
 
   //-------------------------------------------------------
 
-  // const availableTables = tableList?.filter((item) => {
-  //   return item.reservation_id == null;
-  // });
-
-  // const occupiedTables = tableList?.filter((item) => {
-  //   return item.reservation_id != null;
-  // });
-  // occupiedTables?.filter((item) => {});
-  // const singleTable = tableList?.filter(
-  //   (table) => table.table_id == form.table_id
-  // );
   async function selectSubmitHandler(e) {
     e.preventDefault();
     mounted = true;
@@ -75,7 +65,6 @@ export default function ReadReservation({ refresh, setRefresh, reservations }) {
         await updateIdsForTableAndRes(form, abortC.signal)
           .then(() => setForm(initialform))
           .then(() => history.push("/dashboard"));
-        // .then(setRefresh(!refresh));
       } catch (error) {
         setTableListErrors(error);
         console.log(error.status, "status");
@@ -84,18 +73,7 @@ export default function ReadReservation({ refresh, setRefresh, reservations }) {
       return () => abortC.abort();
     }
   }
-  // }
-  // check res capacity vs table capacity
-  // if (reservation.capacity > singleTable.capacity) {
-  //   // throw new Error("Not enough capacity");
-  //   return;
-  // }
-  //  else if (singleTable.reservation_id != null) {
-  //   return;
-  //   // throw new Error("occupied");
-  // } else
-  //  {
-  //------------
+
   //-------------------------------------------------------
 
   async function selectChangeHandler({ target }) {
@@ -107,10 +85,7 @@ export default function ReadReservation({ refresh, setRefresh, reservations }) {
   }
 
   //-------------------------------------------------------
-  //list of tables free
-  // const filter = tableList.filter((table) => {
-  //   return table.reservation_id !== null;
-  // });
+
   const list = tableList?.map((table, index) => {
     return (
       <tr key={index + index - 1} className="tr">
@@ -139,29 +114,12 @@ export default function ReadReservation({ refresh, setRefresh, reservations }) {
           <tbody>{list}</tbody>
         </table>
       </div>
-      <form onSubmit={selectSubmitHandler}>
-        <label htmlFor="table_id">Table Number :</label>
-        <select
-          required
-          onChange={selectChangeHandler}
-          name="table_id"
-          min="1"
-          id="table_id"
-        >
-          <option value="">Please Select</option>
-          {tableOptions}
-        </select>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          onClick={selectSubmitHandler}
-        >
-          Submit
-        </button>
-        <button onClick={() => history.goBack()} className="btn btn-secondary">
-          Cancel
-        </button>
-      </form>
+      <SeatingForm
+        tableOptions={tableOptions}
+        selectChangeHandler={selectChangeHandler}
+        selectSubmitHandler={selectSubmitHandler}
+        history={history}
+      />
       <div>
         <ErrorAlert error={tableListErrors} />
       </div>

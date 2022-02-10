@@ -41,20 +41,20 @@ describe("US-04 - Seat reservation - E2E", () => {
       await page.type("input[name=table_name]", tableName);
       await page.type("input[name=capacity]", "6");
 
-      await page.screenshot({
-        path: ".screenshots/us-04-create-table-submit-before.png",
-        fullPage: true,
-      });
+      // await page.screenshot({
+      //   path: ".screenshots/us-04-create-table-submit-before.png",
+      //   fullPage: true,
+      // });
 
       await Promise.all([
         page.click("button[type=submit]"),
         page.waitForNavigation({ waitUntil: "networkidle0" }),
       ]);
 
-      await page.screenshot({
-        path: ".screenshots/us-04-create-table-submit-after.png",
-        fullPage: true,
-      });
+      // await page.screenshot({
+      //   path: ".screenshots/us-04-create-table-submit-after.png",
+      //   fullPage: true,
+      // });
 
       await expect(page).toMatch(tableName);
     });

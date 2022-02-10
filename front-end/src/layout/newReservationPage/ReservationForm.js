@@ -1,7 +1,7 @@
 import React from "react";
-import ErrorAlert from "../ErrorAlert";
+import ErrorAlert from "../CommonFiles/ErrorAlert";
 //-------------------------------------------------------
-export default function NewReservationForm({
+export default function ReservationForm({
   changeHandlerNum,
   submitHandler,
   changeHandler,
@@ -9,6 +9,17 @@ export default function NewReservationForm({
   apiErrors,
   history,
 }) {
+  const changeHandler = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  function changeHandlerNum({ target: { name, value } }) {
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: Number(value),
+    }));
+  }
+
   //---------------------
   return (
     <div>

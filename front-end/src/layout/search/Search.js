@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { listReservations } from "../../utils/api";
-import ErrorAlert from "../ErrorAlert";
+import ErrorAlert from "../CommonFiles/ErrorAlert";
+import { v4 as uuid } from "uuidv4";
 
 export default function Search() {
   const initialPhoneForm = {
@@ -12,31 +14,25 @@ export default function Search() {
 
   //---------------------------------------------------------------------------------------
   function changeHandler({ target }) {
-    setPhoneNumber(
-      { ...phoneNumber, [target.id]: target.value },
-      console.log(phoneNumber, "PhoneNUmberIndSetter")
-    );
+    setPhoneNumber({ ...phoneNumber, [target.id]: target.value });
   }
   //---------------------------------------------------------------------------------------
 
-  //-------FIX MEEEEEEE_____does not update state for phonenumber
-  // async function findHandler(e) {
-  //   e.preventDefault();
-  //   console.log("phoneNumber", phoneNumber, "phonenumber");
-  //   await listReservations(phoneNumber)
-  //     .then(setReservations)
-  //     .catch(setErrors)
-  //     .then(setPhoneNumber(initialPhoneForm));
-  //   console.log(phoneNumber, reservations, "phoneNumber ITS HERE I SWEAR");
-  // }
   async function findHandler(e) {
     e.preventDefault();
-    console.log("phoneNumber", phoneNumber, "phonenumber");
-    await listReservations(phoneNumber)
-      .catch(setErrors)
-      .then(setReservations)
-      .then(setPhoneNumber(initialPhoneForm));
-    console.log(phoneNumber, reservations, "phoneNumber ITS HERE I SWEAR");
+    try {
+      await listReservations(phoneNumber).then(setReservations);
+    } catch (error) {
+      setErrors(error);
+    }
+  }
+  function cancelHandler() {
+    if (
+      window.confirm(
+        "Do you want to cancel this reservation? This cannot be undone."
+      )
+    ) {
+    }
   }
   //---------------------------------------------------------------------------------------
   return (
@@ -76,32 +72,46 @@ export default function Search() {
           </tr>
         </thead>
         <tbody>
-          {reservations ? (
-            reservations.map((entry) => {
-              return (
-                <tr className="tr">
-                  <td className="td">{entry.mobile_number}</td>
-                  <td className="td">{entry.reservation_date}</td>
-                  <td className="td">{entry.reservation_time}</td>
-                  <td className="td">{entry.reservation_id}</td>
-                  <td className="td">{entry.last_name}</td>
-                  <td className="td">{entry.first_name}</td>
-                  <td className="td">{entry.people}</td>
-                  <td className="td">{entry.status}</td>
-                  <td className="td">{entry.table_id}</td>
-                </tr>
-              );
-            })
-          ) : (
-            <div>
-              <div>
-                <h1>No reservations found</h1>
-              </div>
-              <ErrorAlert errors={errors} />
-            </div>
-          )}
+          {reservations?.map((entry) => {
+            return (
+              <tr className="tr" key={entry.reservation_id}>
+                <td className="td">{entry.mobile_number}</td>
+                <td className="td">{entry.reservation_date}</td>
+                <td className="td">{entry.reservation_time}</td>
+                <td className="td">{entry.reservation_id}</td>
+                <td className="td">{entry.last_name}</td>
+                <td className="td">{entry.first_name}</td>
+                <td className="td">{entry.people}</td>
+                <td className="td">{entry.status}</td>
+                <td className="td">{entry.table_id}</td>
+                <td>
+                  <Link
+                    className="btn btn_dark"
+                    to={"/reservations/:reservation_id/edit"}
+                    href={`/reservations/${entry.reservation_id}/edit`}
+                  >
+                    Edit
+                  </Link>
+                </td>
+                <td>
+                  <button
+                    onClick={cancelHandler}
+                    data-reservation-id-cancel={entry.reservation_id}
+                  >
+                    Cancel
+                  </button>{" "}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
+      {reservations.length === 0 ? (
+        <div>No reservations found</div>
+      ) : (
+        <div></div>
+      )}
+      <ErrorAlert error={errors} />
     </div>
   );
 }

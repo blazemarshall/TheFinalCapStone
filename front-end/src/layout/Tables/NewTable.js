@@ -22,23 +22,20 @@ export default function NewTable() {
     e.preventDefault();
     const controller = new AbortController();
     try {
-      // await createTable(tableFormData, controller.signal);
+      await createTable(tableFormData, controller.signal);
 
-      setTableFormData(initialTableForm);
+      // setTableFormData(initialTableForm);
       history.push("/dashboard");
     } catch (error) {
       console.log(error);
-      // await setApiTableErrors(error);
     }
     return () => controller.abort();
   }
   //----------------------------------------------
   const changeHandler = (e) => {
-    console.log(e.target.value, "dog");
     setTableFormData({ ...tableFormData, [e.target.name]: e.target.value });
   };
   const numChangeHandler = (e) => {
-    console.log(e.target.value);
     setTableFormData({
       ...tableFormData,
       [e.target.name]: Number(e.target.value),

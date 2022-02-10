@@ -1,5 +1,5 @@
 import React from "react";
-import ErrorAlert from "../ErrorAlert";
+import ErrorAlert from "../CommonFiles/ErrorAlert";
 export default function TableForm({
   cancelHandler,
   changeHandler,

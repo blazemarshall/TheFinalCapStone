@@ -1,28 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useLocation, Link } from "react-router-dom";
-import { v4 as uuid } from "uuid";
-import {
-  deleteHandlerForResStatus,
-  deleteHandlerForTableResId,
-  listReservations,
-  listTables,
-  updateSeatedStatusForRes,
-} from "../utils/api";
-import ErrorAlert from "../layout/ErrorAlert";
+import { listReservations, listTables } from "../utils/api";
+import ErrorAlert from "../layout/CommonFiles/ErrorAlert";
 import formatReservationTime from "../utils/format-reservation-time";
 import { previous, next, today } from "../utils/date-time";
 import "./Dashboard.css";
-
-// import useQuery from "../utils/useQuery";
+import ListOfTables from "./ListOfTables";
+import CancelButton from "../layout/CancelButton";
 
 /**
- * Defines the dashboard page.
  * @param date
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ dateParam, tables, setTables, refresh, setRefresh }) {
-  let mounted = false;
+function Dashboard({ dateParam, setTables }) {
   function useQuery() {
     return new URLSearchParams(useLocation().search);
   }
@@ -32,7 +23,6 @@ function Dashboard({ dateParam, tables, setTables, refresh, setRefresh }) {
   const [date, setDate] = useState(query.get("date") || dateParam);
   const [reservationsError, setReservationsError] = useState(null);
   const [tablesError, setTablesError] = useState(null);
-  const [error, setError] = useState(null);
   //------------------------------------------------------
   useEffect(() => {
     function loadDashboard() {
@@ -50,10 +40,9 @@ function Dashboard({ dateParam, tables, setTables, refresh, setRefresh }) {
       return () => abortController.abort();
     }
     loadDashboard();
-  }, [date, refresh]);
+  }, [date]);
   //-----------------------------------------------------
   formatReservationTime(reservations);
-
   function twelveHourTime(time) {
     let timeArr = time.split(":");
     let amPM = "a";
@@ -69,127 +58,65 @@ function Dashboard({ dateParam, tables, setTables, refresh, setRefresh }) {
   }
 
   //maps reservations---------------------------------------
-  const reserveMap = reservations
-    // ?.filter((item) => {
-    //   return item.status != "finished";
-    // })
+  let reservationsToDisplay = reservations.filter((item) => {
+    return item.status !== "finished" && item.status !== "cancelled";
+  });
 
-    .map((item, index) => {
-      const {
-        reservation_id,
-        reservation_time,
-        first_name,
-        last_name,
-        table_id,
-        mobile_number,
-        people,
-        status,
-      } = item;
+  const reserveMap = reservationsToDisplay.map((item) => {
+    const {
+      reservation_id,
+      reservation_time,
+      first_name,
+      last_name,
+      table_id,
+      mobile_number,
+      people,
+      status,
+    } = item;
 
-      return (
-        <tr className="col tr" key={uuid()}>
-          <td className="td">{reservation_id}</td>
-          <td className="td">{twelveHourTime(reservation_time)}</td>
-          <td className="td">
-            {first_name} {last_name}
-          </td>
-          <td className="td">{people}</td>
-          <td className="td">{mobile_number}</td>
-          <td className="td">{table_id}</td>
-          <td className="td" data-reservation-id-status={reservation_id}>
-            {status}
-          </td>
-          <td className="td">
-            {status === "booked" ? (
-              <button
-                onClick={() => seatHandler(reservation_id)}
-                href={`/reservations/${reservation_id}/seat`}
-                className="btn-success btn"
-              >
-                Seat
-              </button>
-            ) : (
-              <div></div>
-            )}
-          </td>
-        </tr>
-      );
-    });
-
-  // maps tables--------------------------------------------
-  console.log(tables, "TABLES DASH");
-  const tableMap = tables?.map((table) => {
     return (
-      <tr key={uuid()}>
-        <td className="td">{table.table_id}</td>
-        <td className="td">{table.table_name}</td>
-        <td className="td">{table.reservation_id}</td>
-        <td className="td">{table.capacity}</td>
-        <td data-table-id-status={table.table_id}>
-          {table.reservation_id ? "occupied" : "free"}
+      <tr className="col tr" key={reservation_id}>
+        <td className="td">{reservation_id}</td>
+        <td className="td">{twelveHourTime(reservation_time)}</td>
+        <td className="td">
+          {first_name} {last_name}
         </td>
-        <td>
-          {table.reservation_id ? (
-            <button
-              className="btn btn-danger"
-              onClick={() =>
-                finishHandler(table.table_id, table.reservation_id)
-              }
-              data-table-id-finish={table.table_id}
+        <td className="td">{people}</td>
+        <td className="td">{mobile_number}</td>
+        <td className="td">{table_id}</td>
+        <td className="td" data-reservation-id-status={reservation_id}>
+          {status}
+        </td>
+        <td className="td">
+          {status === "booked" ? (
+            <Link
+              className="btn"
+              to={`/reservations/${reservation_id}/seat`}
+              className="btn-success btn"
             >
-              Finish
-            </button>
+              Seat
+            </Link>
           ) : (
             <div></div>
           )}
         </td>
+        <td>
+          <Link
+            className="btn btn_dark"
+            to={"/reservations/:reservation_id/edit"}
+            href={`/reservations/${reservation_id}/edit`}
+          >
+            Edit
+          </Link>
+        </td>
+        <td>
+          <CancelButton resId={reservation_id} />
+        </td>
       </tr>
     );
   });
-  //------------------------------------------------------------------
-  // us-05 seat handler
-  async function seatHandler(resId, table) {
-    let acc = new AbortController();
-    console.log("Seat was clicked");
-    let status = "seated";
-    console.log(resId, "RES ID");
-    //   //when clicked set status to seated
-    history.push(`/reservations/${resId}/seat`);
-  }
 
-  //finishHandler
-  async function finishHandler(tableId, reservation_id) {
-    console.log(tableId, reservation_id, "finishHandler");
-    mounted = true;
-    if (mounted) {
-      try {
-        let abortedCommand = new AbortController();
-        let ac = new AbortController();
-        if (
-          window.confirm(
-            "Is this table ready to seat new guests? This cannot be undone."
-          )
-        ) {
-          await deleteHandlerForTableResId(
-            tableId,
-            reservation_id,
-            abortedCommand.signal
-          )
-            .then(() => history.go(0))
-            .catch(console.log);
-          console.log("does it make it past tableResID?????");
-          // await deleteHandlerForResStatus(reservation_id, ac.signal)
-          // .then(
-          // setRefresh(!refresh);
-        } else {
-        }
-      } catch (error) {
-        setError(error);
-      }
-      mounted = false;
-    }
-    //us 06 when clicked removes reservation from dashboard
-  }
+  //------------------------------------------------------------------
 
   //increments date
   function forwardHandler() {
@@ -249,18 +176,7 @@ function Dashboard({ dateParam, tables, setTables, refresh, setRefresh }) {
         </div>
         <div>
           <h4>List of tables</h4>
-          <table>
-            <thead>
-              <tr>
-                <th className="th">table_id</th>
-                <th className="th">Table Name</th>
-                <th className="th">Reservation</th>
-                <th className="th">Capacity</th>
-                <th className="th">Status</th>
-              </tr>
-            </thead>
-            <tbody>{tableMap}</tbody>
-          </table>
+          <ListOfTables />
         </div>
       </div>
     </main>

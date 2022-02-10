@@ -65,7 +65,6 @@ export async function listTables(signal) {
 }
 // 2 used in readReservation component
 export async function updateIdsForTableAndRes(formData, signal) {
-  console.log(formData, "UpdateIDSTABLERES");
   const url = new URL(`${API_BASE_URL}/tables/${formData.table_id}/seat`);
   const options = {
     method: "PUT",
@@ -78,7 +77,6 @@ export async function updateIdsForTableAndRes(formData, signal) {
 
 // used in newTable component
 export async function createTable(table, signal) {
-  console.log(table, "createable");
   const url = new URL(`${API_BASE_URL}/tables`);
   const options = {
     method: "POST",
@@ -103,16 +101,16 @@ export async function deleteHandlerForTableResId(tableId, resId, signal) {
   };
   return await fetchJson(url, options, {});
 }
-export async function deleteHandlerForResStatus(resId, signal) {
-  const url = new URL(`${API_BASE_URL}/reservations/${resId}/status`);
-  const options = {
-    method: "PUT",
-    headers,
-    body: JSON.stringify({ data: { status: "finished" } }),
-    signal,
-  };
-  return await fetchJson(url, options, {});
-}
+// export async function deleteHandlerForResStatus(resId, status, signal) {
+//   const url = new URL(`${API_BASE_URL}/reservations/${resId}/status`);
+//   const options = {
+//     method: "PUT",
+//     headers,
+//     body: JSON.stringify({ data: { status } }),
+//     signal,
+//   };
+//   return await fetchJson(url, options, {});
+// }
 
 //------------------reservations----------------------------------
 //used in dashboard
@@ -125,6 +123,7 @@ export async function listReservations(params, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+
 //used in newReservation component
 export async function createReservation(reservation, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
@@ -141,14 +140,14 @@ export async function reservationGrab(reservationId, signal) {
   const url = `${API_BASE_URL}/reservations/${reservationId}`;
   return await fetchJson(url, { signal }, {});
 }
-
+//supposed to update
 //used in dashboard
-export async function updateSeatedStatusForRes(resId, signal) {
+export async function updateStatusForRes(resId, status, signal) {
   const url = new URL(`${API_BASE_URL}/reservations/${resId}/status`);
   const options = {
     method: "PUT",
     headers,
-    body: JSON.stringify({ data: { status: "seated" } }),
+    body: JSON.stringify({ data: { status } }),
     signal,
   };
   return await fetchJson(url, options, {});
