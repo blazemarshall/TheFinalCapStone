@@ -103,7 +103,7 @@ function Dashboard({ dateParam, setTables }) {
         <td>
           <Link
             className="btn btn_dark"
-            to={"/reservations/:reservation_id/edit"}
+            to={`/reservations/${reservation_id}/edit`}
             href={`/reservations/${reservation_id}/edit`}
           >
             Edit

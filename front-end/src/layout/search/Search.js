@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { listReservations } from "../../utils/api";
 import ErrorAlert from "../CommonFiles/ErrorAlert";
-import { v4 as uuid } from "uuidv4";
 
 export default function Search() {
   const initialPhoneForm = {

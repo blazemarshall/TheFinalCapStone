@@ -28,10 +28,10 @@ function create(newReservation) {
 }
 
 //----------- read----------------------------
-function read(resId) {
+function read(reservation_id) {
   return knex("reservations as r")
     .select("*")
-    .where({ reservation_id: resId })
+    .where({ reservation_id })
     .then((result) => result[0]);
 }
 // -----------update---------------------------

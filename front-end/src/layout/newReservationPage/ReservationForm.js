@@ -1,14 +1,22 @@
-import React from "react";
-import ErrorAlert from "../CommonFiles/ErrorAlert";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+import { today } from "../../utils/date-time";
 //-------------------------------------------------------
 export default function ReservationForm({
-  changeHandlerNum,
   submitHandler,
-  changeHandler,
-  formData,
-  apiErrors,
-  history,
+  initialReservationFields = {
+    first_name: "",
+    last_name: "",
+    mobile_number: "",
+    reservation_date: today(),
+    reservation_time: "",
+    people: 1,
+    status: "booked",
+  },
 }) {
+  const history = useHistory();
+  const [formData, setFormData] = useState(initialReservationFields);
+
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -24,11 +32,16 @@ export default function ReservationForm({
   return (
     <div>
       <h1>Create Reservation</h1>
-      <form onSubmit={submitHandler}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          submitHandler(formData);
+        }}
+      >
         <div>
           <div>
             <input
-              // id="first_name"
+              id="first_name"
               name="first_name"
               required
               type="text"
@@ -41,7 +54,7 @@ export default function ReservationForm({
           </div>
           <div>
             <input
-              // id="last_name"
+              id="last_name"
               name="last_name"
               required
               type="text"
@@ -54,7 +67,7 @@ export default function ReservationForm({
           </div>
           <div>
             <input
-              // id="mobile_number"
+              id="mobile_number"
               name="mobile_number"
               required
               type="tel"
@@ -67,7 +80,7 @@ export default function ReservationForm({
           </div>
           <div>
             <input
-              // id="reservation_date"
+              id="reservation_date"
               name="reservation_date"
               required
               type="date"
@@ -79,7 +92,7 @@ export default function ReservationForm({
             />
             <div>
               <input
-                // id="reservation_time"
+                id="reservation_time"
                 name="reservation_time"
                 required
                 type="time"
@@ -104,21 +117,17 @@ export default function ReservationForm({
                 value={formData.people}
               />
             </div>
-            <ErrorAlert error={apiErrors} />
             <div>
               <button type="submit" className="btn btn-primary">
                 Submit
-              </button>
-              <button
-                onClick={() => history.goBack()}
-                className="btn btn-secondary"
-              >
-                Cancel
               </button>
             </div>
           </div>
         </div>
       </form>
+      <button onClick={() => history.goBack()} className="btn btn-secondary">
+        Cancel
+      </button>
     </div>
   );
 }

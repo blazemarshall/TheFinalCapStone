@@ -17,9 +17,9 @@ export default function CancelButton({ resId }) {
   }
   return (
     <button
-      key={resId}
+      // key={resId}
       data-reservation-id-cancel={resId}
-      className="btn btn_light"
+      className="btn btn-secondary"
       onClick={() => clickHandler(resId)}
     >
       Cancel
