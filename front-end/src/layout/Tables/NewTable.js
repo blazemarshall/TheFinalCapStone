@@ -11,7 +11,6 @@ export default function NewTable() {
   const history = useHistory();
   const [tableFormData, setTableFormData] = useState(initialTableForm);
   const [apiTableErrors, setApiTableErrors] = useState(null);
-  let mounted = false;
 
   //--------------------------------------------
   function cancelHandler() {
@@ -24,10 +23,9 @@ export default function NewTable() {
     try {
       await createTable(tableFormData, controller.signal);
 
-      // setTableFormData(initialTableForm);
       history.push("/dashboard");
     } catch (error) {
-      console.log(error);
+      setApiTableErrors(error);
     }
     return () => controller.abort();
   }

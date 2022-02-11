@@ -40,7 +40,7 @@ function Dashboard({ dateParam, setTables }) {
       return () => abortController.abort();
     }
     loadDashboard();
-  }, [date]);
+  }, [date, setTables]);
   //-----------------------------------------------------
   formatReservationTime(reservations);
   function twelveHourTime(time) {
@@ -90,7 +90,6 @@ function Dashboard({ dateParam, setTables }) {
         <td className="td">
           {status === "booked" ? (
             <Link
-              className="btn"
               to={`/reservations/${reservation_id}/seat`}
               className="btn-success btn"
             >
@@ -176,7 +175,7 @@ function Dashboard({ dateParam, setTables }) {
         </div>
         <div>
           <h4>List of tables</h4>
-          <ListOfTables />
+          <ListOfTables setTablesError={setTablesError} />
         </div>
       </div>
     </main>

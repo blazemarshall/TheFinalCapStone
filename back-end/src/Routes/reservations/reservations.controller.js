@@ -38,8 +38,6 @@ async function list(req, res, next) {
     next(error);
   }
 }
-//make phone list
-// async function
 
 //-----------------create-------------------------------------------
 
@@ -86,7 +84,7 @@ module.exports = {
   read: [asyncEB(reservationExists), asyncEB(read)],
   //updates seat assignment
   update: [
-    reservationExists,
+    asyncEB(reservationExists),
     properties,
     DateCorrectFormat,
     PeopleNumber,
@@ -95,7 +93,7 @@ module.exports = {
   ],
   //updates status assignment
   updateStatus: [
-    reservationExists,
+    asyncEB(reservationExists),
     statusCheckReservation,
     unknownStatus,
     asyncEB(updatedStatus),

@@ -20,6 +20,7 @@ export default function TableForm({
             type="text"
             placeholder="Minimum of 2 characters."
             minLength="2"
+            maxLength="20"
             onChange={changeHandler}
           />
         </div>
@@ -31,6 +32,7 @@ export default function TableForm({
               name="capacity"
               type="number"
               min="1"
+              max="500"
               placeholder="Minimum of 1 seat."
               onChange={numChangeHandler}
             />

@@ -1,20 +1,20 @@
 import { deleteHandlerForTableResId, listTables } from "../utils/api";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import ErrorAlert from "../layout/CommonFiles/ErrorAlert";
 
-export default function ListOfTables() {
+export default function ListOfTables({ setTablesError }) {
   const [tables, setTables] = useState([]);
-  const [tablesError, setTablesError] = useState(null);
   let history = useHistory();
 
-  useEffect(loadTables, []);
+  useEffect(() => {
+    function loadTables() {
+      const ac = new AbortController();
+      listTables(ac.signal).then(setTables).catch(setTablesError);
+      return () => ac.abort();
+    }
 
-  function loadTables() {
-    const ac = new AbortController();
-    listTables(ac.signal).then(setTables).catch(setTablesError);
-    return () => ac.abort();
-  }
+    loadTables();
+  }, [setTablesError]);
 
   async function finishHandler(tableId, reservation_id) {
     try {

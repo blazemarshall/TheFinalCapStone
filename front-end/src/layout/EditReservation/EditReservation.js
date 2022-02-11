@@ -10,18 +10,19 @@ export default function EditReservation() {
   const [errors, setErrors] = useState(null);
   const { reservation_id } = useParams();
   const [reservation, setReservation] = useState(null);
-  useEffect(loadReservation, [reservation_id]);
-
-  async function loadReservation() {
-    let ac = new AbortController();
-    try {
-      let singleReservation = await reservationGrab(reservation_id);
-      setReservation(singleReservation);
-    } catch (error) {
-      setErrors(error);
+  useEffect(() => {
+    async function loadReservation() {
+      let ac = new AbortController();
+      try {
+        let singleReservation = await reservationGrab(reservation_id);
+        setReservation(singleReservation);
+      } catch (error) {
+        setErrors(error);
+      }
+      return () => ac.abort();
     }
-    return () => ac.abort();
-  }
+    loadReservation();
+  }, [reservation_id]);
 
   async function submitHandler(formData) {
     const ac = new AbortController();
@@ -35,7 +36,6 @@ export default function EditReservation() {
     }
     return () => ac.abort();
   }
-  console.log(reservation, "Reptile");
   return (
     <div>
       {reservation && (

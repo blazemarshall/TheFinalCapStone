@@ -45,6 +45,7 @@ export default function ReservationForm({
               name="first_name"
               required
               type="text"
+              maxLength="20"
               className="form-control"
               placeholder="First name"
               aria-label="First Name"
@@ -58,6 +59,7 @@ export default function ReservationForm({
               name="last_name"
               required
               type="text"
+              maxLength="20"
               className="form-control"
               placeholder="Last Name"
               aria-label="last_name"
@@ -71,6 +73,7 @@ export default function ReservationForm({
               name="mobile_number"
               required
               type="tel"
+              maxLength="20"
               className="form-control"
               placeholder="Mobile Number"
               aria-label="Mobile Number"
@@ -113,17 +116,17 @@ export default function ReservationForm({
                 placeholder="Number of People"
                 aria-label="people"
                 min="1"
+                max="500"
                 onChange={changeHandlerNum}
                 value={formData.people}
               />
             </div>
-            <div>
-              <button type="submit" className="btn btn-primary">
-                Submit
-              </button>
-            </div>
+            <div></div>
           </div>
         </div>
+        <button type="submit" className="btn btn-primary">
+          Submit
+        </button>
       </form>
       <button onClick={() => history.goBack()} className="btn btn-secondary">
         Cancel
